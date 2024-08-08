@@ -19,6 +19,7 @@ import type * as http from "../http.js";
 import type * as materials from "../materials.js";
 import type * as metadata from "../metadata.js";
 import type * as users from "../users.js";
+import type * as warehouses from "../warehouses.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   materials: typeof materials;
   metadata: typeof metadata;
   users: typeof users;
+  warehouses: typeof warehouses;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
