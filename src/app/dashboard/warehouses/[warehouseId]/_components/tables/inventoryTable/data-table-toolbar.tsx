@@ -40,11 +40,6 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
-  let types2 = useQuery(api.materials.getUniqueMaterialTypes2);
-
-  if (!types2) {
-    types2 = [];
-  }
 
   return (
     <div className="flex items-center justify-between gap-2">
@@ -60,24 +55,7 @@ export function DataTableToolbar<TData>({
           className="max-w-sm"
         />
       </div>
-      <div className="flex flex-1 items-center space-x-2">
-        {table.getColumn("materialType") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("materialType")}
-            title="Tipo"
-            options={types2}
-          />
-        )}
-        {isFiltered && (
-          <Button
-            variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
-          >
-            Reset
-          </Button>
-        )}
-      </div>
+
     </div>
   );
 }

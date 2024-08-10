@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
-import { Doc, Id } from "./_generated/dataModel";
-import { MutationCtx, action, mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
+import { query } from "./_generated/server";
 
 export const queryTransactionById = query({
   args: { transactionId: v.id("transactions") },
@@ -26,7 +26,7 @@ export const queryTransactionDetailsByTransactionId = query({
 
     const enrichedDetails = await Promise.all(
       transactionsDetails.map(async (detail) => {
-        const material = await ctx.db.get(detail.material);
+        const material = await ctx.db.get(detail.materialId);
         return {
           ...detail,
           materialName: material?.name,
@@ -51,7 +51,7 @@ export const queryTransactionsContainingMaterial = query({
     // 1. Query transactionsDetails by material ID
     const transactionsDetails = await ctx.db
       .query("transactions_details")
-      .filter((q) => q.eq(q.field("material"), args.materialId))
+      .filter((q) => q.eq(q.field("materialId"), args.materialId))
       .collect();
 
     // 2. For each transaction, get the from_location and to_location from the transactions table
@@ -90,6 +90,91 @@ export const queryTransactionsContainingMaterial = query({
         action_type: transaction.action_type,
       };
     });
+
+    return enrichedTransactions;
+  },
+});
+
+type EnrichedTransaction = {
+  _creationTime: number;
+  _id: Id<"transactions">;
+  from_location?: Id<"warehouses">;
+  to_location?: Id<"warehouses">;
+  action_type: string;
+  materials: {
+    materialId: Id<"materials">;
+    materialVersionId: Id<"materialVersions">;
+    quantity: number;
+    materialName: string;
+    materialType: string | undefined;
+    materialImageFileId: Id<"_storage"> | undefined;
+    versionNumber: number;
+    versionCreationTime: number;
+  }[];
+  fromWarehouseId?: Id<"warehouses">;
+  toWarehouseId?: Id<"warehouses">;
+  description?: string;
+};
+
+export const getTransactionsForDisplayByWarehouseId = query({
+  args: { warehouseId: v.id("warehouses") },
+  handler: async (ctx, args) => {
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("from_location"), args.warehouseId),
+          q.eq(q.field("to_location"), args.warehouseId)
+        )
+      )
+      .collect();
+
+    const enrichedTransactions: EnrichedTransaction[] = await Promise.all(
+      transactions.map(async (transaction) => {
+        const details = await ctx.db
+          .query("transactions_details")
+          .withIndex("by_transaction", (q) =>
+            q.eq("transaction", transaction._id)
+          )
+          .collect();
+
+        const materials = await Promise.all(
+          details.map(async (detail) => {
+            const material = await ctx.db.get(detail.materialId);
+            const materialVersion = await ctx.db.get(detail.materialVersionId);
+
+            if (!material || !materialVersion) {
+              throw new Error(
+                `Material or version not found for detail ${detail._id}`
+              );
+            }
+
+            return {
+              materialId: detail.materialId,
+              materialVersionId: detail.materialVersionId,
+              quantity: detail.quantity,
+              materialName: materialVersion.name,
+              materialType: materialVersion.type,
+              materialImageFileId: material.imageFileId,
+              versionNumber: materialVersion.versionNumber,
+              versionCreationTime: materialVersion._creationTime,
+            };
+          })
+        );
+
+        return {
+          _creationTime: transaction._creationTime,
+          _id: transaction._id,
+          from_location: transaction.from_location,
+          to_location: transaction.to_location,
+          action_type: transaction.action_type,
+          materials,
+          fromWarehouseId: transaction.from_location,
+          toWarehouseId: transaction.to_location,
+          description: transaction.description,
+        };
+      })
+    );
 
     return enrichedTransactions;
   },

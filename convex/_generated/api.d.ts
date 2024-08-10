@@ -16,6 +16,8 @@ import type {
 } from "convex/server";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as inventories from "../inventories.js";
+import type * as material_audit_logs from "../material_audit_logs.js";
 import type * as materials from "../materials.js";
 import type * as transactions from "../transactions.js";
 import type * as transactions_details from "../transactions_details.js";
@@ -33,6 +35,8 @@ import type * as warehouses from "../warehouses.js";
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
+  inventories: typeof inventories;
+  material_audit_logs: typeof material_audit_logs;
   materials: typeof materials;
   transactions: typeof transactions;
   transactions_details: typeof transactions_details;

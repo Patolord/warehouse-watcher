@@ -42,7 +42,7 @@ export default function EditSheet({
 }: {
   material: Doc<"materials">;
 }) {
-  const updateMaterial = useMutation(api.materials.updateMaterialbyId);
+  const updateMaterial = useMutation(api.materials.updateMaterialById);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

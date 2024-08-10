@@ -13,69 +13,82 @@ import { AddMaterialButton } from "./_components/buttons/add-button";
 import { DataTable } from "./_components/tables/data-table";
 import { columns } from "./_components/tables/inventoryTable/columns";
 import { MovDataTable } from "./_components/tables/movTable/mov-data-table";
-import { columns as movementsColumns } from "./_components/tables/movTable/movements-columns";
+import { columns as transactionsColumns } from "./_components/tables/movTable/movements-columns";
 import { Cart } from "@/components/Cart";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMediaQuery } from "@/hooks/use-media-query";
+
+type EnrichedTransaction = {
+  _creationTime: number;
+  _id: Id<"transactions">;
+  from_location?: Id<"warehouses">;
+  to_location?: Id<"warehouses">;
+  action_type: string;
+  materials: {
+    materialId: Id<"materials">;
+    materialVersionId: Id<"materialVersions">;
+    quantity: number;
+    materialName: string;
+    materialType: string | undefined;
+    materialImageFileId: Id<"_storage"> | undefined;
+    versionNumber: number;
+    versionCreationTime: number;
+  }[];
+  fromWarehouseId?: Id<"warehouses">;
+  toWarehouseId?: Id<"warehouses">;
+  description?: string;
+};
 
 export default function WarehousePage({
   params,
 }: {
   params: { warehouseId: Id<"warehouses"> };
 }) {
+
   //Convex Queries
-  const materials = useQuery(api.inventories.getInventoryByWarehouseId, {
+
+  const currentWarehouse = useQuery(api.warehouses.getWarehouseById, {
+    warehouseId: params.warehouseId,
+  });
+  //query inventory information
+  const inventory = useQuery(api.inventories.getInventoryForDisplayByWarehouseId, {
     warehouseId: params.warehouseId,
   });
 
-  const warehouse = useQuery(api.warehouses.getWarehouseById, {
+
+  const transactions = useQuery(api.transactions.getTransactionsForDisplayByWarehouseId, {
     warehouseId: params.warehouseId,
   });
 
-  const warehouses = useQuery(api.warehouses.getWarehouses);
 
-  const movements = useQuery(
-    api.material_movements.getMaterialMovementsByWarehouseId,
-    { warehouseId: params.warehouseId },
-  );
+  if (!inventory) {
+    <div>Carregando...</div>;
+  }
+
+  if (!transactions) {
+    <div>Carregando...</div>;
+  }
+
   const isTablet = useMediaQuery("(min-width: 640px)");
   const [selectedType, setSelectedType] = useState("");
+  const tableData: (EnrichedTransaction | null)[] = transactions || [];
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(event.target.value);
   };
-
-  //get material details from movements
-
-  if (!materials || !warehouse || !movements || !warehouses) {
-    return (
-      <main className="flex flex-1 py-4 h-screen sm:h-fit flex-col space-y-2px-4">
-        <div>Carregando...</div>
-      </main>
-    );
-  }
-
-  const materialTypes = materials?.map((material) => material!.materialType);
-  const uniqueMaterialTypes = materialTypes?.filter(
-    (type, index, array) => array.indexOf(type) === index,
-  );
-
-  const filteredMaterials = materials.filter((material) =>
-    selectedType ? material!.materialType === selectedType : true,
-  );
 
   if (isTablet) {
     return (
       <main className="flex flex-1 py-4 h-screen sm:h-fit flex-col space-y-2 px-4 relative">
         <div className="flex items-center relative z-10">
           <Button asChild variant="link">
-            <Link href="/warehouses">
+            <Link href="/dashboard/warehouses">
               <ArrowBigLeft size={20} strokeWidth={1.75} />
             </Link>
           </Button>
           <h3 className="text-xl">
-            Materiais em &quot;{warehouse?.name}&quot;
+            Materiais em &quot;{currentWarehouse?.name}&quot;
           </h3>
         </div>
         <Image
@@ -98,15 +111,17 @@ export default function WarehousePage({
               <Cart warehouseId={params.warehouseId} />
             </h2>
 
-            <div>
-              <DataTable columns={columns} data={materials} />
+            <div>{
+              inventory && inventory.length > 0 ? (<DataTable columns={columns} data={inventory} />)
+                : <div>Nenhum material cadastrado.</div>}
+
             </div>
           </TabsContent>
           <TabsContent value="movimentos">
             <h3 className="text-xl mb-3 mt-28">Movimentações</h3>
 
             <div>
-              <MovDataTable columns={movementsColumns} data={movements} />
+              <MovDataTable columns={transactionsColumns} data={tableData} />
             </div>
           </TabsContent>
         </Tabs>
@@ -118,11 +133,11 @@ export default function WarehousePage({
     <main className="flex flex-1 py-4 h-screen sm:h-fit flex-col space-y-2 px-4 relative">
       <div className="flex items-center relative z-10">
         <Button asChild variant="link">
-          <Link href="/warehouses">
+          <Link href="/dashboard/warehouses">
             <ArrowBigLeft size={20} strokeWidth={1.75} />
           </Link>
         </Button>
-        <h3 className="text-xl">Materiais em &quot;{warehouse?.name}&quot;</h3>
+        <h3 className="text-xl">Materiais em &quot;{currentWarehouse?.name}&quot;</h3>
       </div>
       <Image
         src="/logistics.svg"
@@ -149,12 +164,12 @@ export default function WarehousePage({
 
             <div className="mt-10 mb-2">
               <label htmlFor="typeFilter">Filtrar: </label>
-              <select
+              {/*  <select
                 id="typeFilter"
                 onChange={handleTypeChange}
                 value={selectedType}
               >
-                {/* map options based on materialTypes */}
+              
                 {uniqueMaterialTypes &&
                   uniqueMaterialTypes.map((type) => (
                     <option key={type} value={type}>
@@ -162,21 +177,21 @@ export default function WarehousePage({
                     </option>
                   ))}
 
-                {/* Add more options as needed */}
-              </select>
+            
+              </select> */}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
               {filteredMaterials.map((material) => (
                 <MaterialCard key={material!.materialId} material={material!} />
               ))}
-            </div>
+            </div> */}
           </div>
         </TabsContent>
         <TabsContent value="movimentos">
           <h3 className="text-xl mb-3 mt-28">Movimentações</h3>
 
           <div>
-            <MovDataTable columns={movementsColumns} data={movements} />
+            <MovDataTable columns={transactionsColumns} data={tableData} />
           </div>
         </TabsContent>
       </Tabs>

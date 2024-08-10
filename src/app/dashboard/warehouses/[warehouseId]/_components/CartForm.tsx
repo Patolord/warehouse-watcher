@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
-
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -36,29 +36,23 @@ export default function CartForm({
     useShallow((state) => ({
       inventoryItems: state.inventoryItems,
       reset: state.reset,
-    })),
+    }))
   );
 
   const warehouses = useQuery(api.warehouses.getWarehouses);
 
   const warehousesMinusCurrent = warehouses?.filter(
-    (warehouse) => warehouse._id !== warehouseId,
+    (warehouse) => warehouse._id !== warehouseId
   );
 
-  const transferStockMovement = useMutation(
-    api.material_movements.transferStockMovement,
-  );
-
-  const removeStockMovement = useMutation(
-    api.material_movements.removeStockMovement,
-  );
+  const updateInventory = useMutation(api.inventories.updateInventory);
 
   const formSchema = z
     .object({
       description: z.string().optional(),
-      toWarehouseId: z.string().optional(), // Optional field for conditional validation
-      consumeHere: z.boolean().optional(), // New field to toggle consumption
-      materialsError: z.string().optional(), // Custom field for materials error
+      toWarehouseId: z.string().optional(),
+      consumeHere: z.boolean().default(false),
+      materialsError: z.string().optional(),
     })
     .refine(
       (data) => {
@@ -68,28 +62,21 @@ export default function CartForm({
         return true;
       },
       {
-        message: "Selecione um estoque de destino",
+        message: "Selecione um estoque de destino ou marque para consumir aqui",
         path: ["toWarehouseId"],
-      },
+      }
     );
 
   const materialsSchema = z
     .array(
       z.object({
-        materialId: z
-          .string()
-          .min(1, { message: "O ID do material é obrigatório" }),
-        materialName: z
-          .string()
-          .min(1, { message: "O nome do material é obrigatório" }),
-        quantity: z
-          .number()
-          .min(1, { message: "A quantidade deve ser maior que zero" }),
-      }),
+        materialId: z.custom<Id<"materials">>(),
+        quantity: z.number().min(1),
+      })
     )
     .min(1, { message: "Deve haver pelo menos um material" });
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       description: "",
@@ -102,7 +89,6 @@ export default function CartForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const materials = inventoryItems.map((item) => ({
       materialId: item.materialId,
-      materialName: item.materialName,
       quantity: item.cartQuantity,
     }));
 
@@ -118,23 +104,20 @@ export default function CartForm({
       return;
     }
 
-    if (values.consumeHere) {
-      await removeStockMovement({
-        materials,
+    try {
+      await updateInventory({
+        fromWarehouse: warehouseId,
+        toWarehouse: values.consumeHere ? undefined : values.toWarehouseId as Id<"warehouses">,
+        actionType: values.consumeHere ? "remove" : "transfer",
+        materials: materials,
         description: values.description,
-        fromWarehouseId: warehouseId,
       });
-    } else {
-      await transferStockMovement({
-        materials,
-        description: values.description,
-        fromWarehouseId: warehouseId,
-        toWarehouseId: values.toWarehouseId as Id<"warehouses">,
-      });
-    }
 
-    // Clear the cart after the transfer
-    reset();
+      toast.success(values.consumeHere ? "Materiais consumidos com sucesso!" : "Transferência realizada com sucesso!");
+      reset();
+    } catch (error) {
+      toast.error("Erro ao processar a operação: " + (error as Error).message);
+    }
   }
 
   return (
@@ -148,13 +131,8 @@ export default function CartForm({
               <FormItem>
                 <FormLabel>Para o estoque:</FormLabel>
                 <Select
-                  onValueChange={(value) => {
-                    // Convert the selected ID to the custom type and handle form state update
-                    const formattedId = value as Id<"warehouses">;
-                    field.onChange(formattedId);
-                    // Optionally update local state if needed
-                  }}
-                  defaultValue={field.value}
+                  onValueChange={field.onChange}
+                  value={field.value}
                   disabled={form.watch("consumeHere")}
                 >
                   <FormControl>
@@ -170,7 +148,6 @@ export default function CartForm({
                     ))}
                   </SelectContent>
                 </Select>
-
                 <FormMessage />
               </FormItem>
             )}
@@ -181,14 +158,14 @@ export default function CartForm({
             name="consumeHere"
             render={({ field }) => (
               <FormItem>
-                <div className="flex gap-4">
-                  <FormLabel>Consumir no estoque atual</FormLabel>
+                <div className="flex items-center gap-4">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
+                  <FormLabel>Consumir no estoque atual</FormLabel>
                 </div>
               </FormItem>
             )}
@@ -203,7 +180,6 @@ export default function CartForm({
                 <FormControl>
                   <Input placeholder="OBS:" {...field} />
                 </FormControl>
-
                 <FormMessage />
               </FormItem>
             )}
@@ -215,7 +191,9 @@ export default function CartForm({
             </div>
           )}
 
-          <Button type="submit">Enviar</Button>
+          <Button type="submit">
+            {form.watch("consumeHere") ? "Consumir" : "Transferir"}
+          </Button>
         </div>
       </form>
     </Form>

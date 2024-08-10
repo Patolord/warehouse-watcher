@@ -1,0 +1,215 @@
+import { Id } from "./_generated/dataModel";
+import { query, mutation, MutationCtx } from "./_generated/server";
+import { ConvexError, v } from "convex/values";
+
+export const updateInventory = mutation({
+  args: {
+    fromWarehouse: v.optional(v.id("warehouses")),
+    toWarehouse: v.optional(v.id("warehouses")),
+    actionType: v.union(
+      v.literal("transfer"),
+      v.literal("add"),
+      v.literal("remove")
+    ),
+    materials: v.array(
+      v.object({
+        materialId: v.id("materials"),
+        materialVersion: v.optional(v.id("materialVersions")),
+        quantity: v.number(),
+      })
+    ),
+    description: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { fromWarehouse, toWarehouse, actionType, materials } = args;
+
+    // Create the transaction
+    const transactionId = await ctx.db.insert("transactions", {
+      from_location: fromWarehouse,
+      to_location: toWarehouse,
+      action_type: actionType,
+      description: args.description,
+    });
+
+    // Process each material
+    for (const { materialId, materialVersion, quantity } of materials) {
+      // Get the current material to access its current version
+      const material = await ctx.db.get(materialId);
+      if (!material) {
+        throw new ConvexError(`Material with ID ${materialId} not found`);
+      }
+
+      // Determine which version ID to use
+      let versionIdToUse: Id<"materialVersions">;
+      if (materialVersion) {
+        versionIdToUse = materialVersion;
+      } else if (material.currentVersionId) {
+        versionIdToUse = material.currentVersionId;
+      } else {
+        // If no version is specified and the material doesn't have a current version,
+        // we need to handle this case. Here, we'll create a new version.
+        versionIdToUse = await ctx.db.insert("materialVersions", {
+          materialId,
+          name: material.name,
+          type: material.type,
+          versionNumber: 1,
+        });
+        await ctx.db.patch(materialId, { currentVersionId: versionIdToUse });
+      }
+
+      // Insert transaction details with both materialId and materialVersionId
+      await ctx.db.insert("transactions_details", {
+        transaction: transactionId,
+        materialId: materialId,
+        materialVersionId: versionIdToUse,
+        quantity,
+      });
+
+      // Update inventory based on action type
+      if (actionType === "transfer") {
+        if (!fromWarehouse || !toWarehouse) {
+          throw new ConvexError(
+            "Both fromWarehouse and toWarehouse are required for transfers"
+          );
+        }
+        await updateWarehouseInventory(
+          ctx,
+          fromWarehouse,
+          materialId,
+          -quantity
+        );
+        await updateWarehouseInventory(ctx, toWarehouse, materialId, quantity);
+      } else if (actionType === "add") {
+        if (!toWarehouse) {
+          throw new ConvexError("toWarehouse is required for additions");
+        }
+        await updateWarehouseInventory(ctx, toWarehouse, materialId, quantity);
+      } else if (actionType === "remove") {
+        if (!fromWarehouse) {
+          throw new ConvexError("fromWarehouse is required for removals");
+        }
+        await updateWarehouseInventory(
+          ctx,
+          fromWarehouse,
+          materialId,
+          -quantity
+        );
+      }
+    }
+
+    return transactionId;
+  },
+});
+
+async function updateWarehouseInventory(
+  ctx: MutationCtx,
+  warehouseId: Id<"warehouses">,
+  materialId: Id<"materials">,
+  quantityChange: number
+) {
+  const existingInventory = await ctx.db
+    .query("inventories")
+    .withIndex("by_warehouse_and_material", (q) =>
+      q.eq("warehouseId", warehouseId).eq("materialId", materialId)
+    )
+    .unique();
+
+  if (existingInventory) {
+    const newQuantity = existingInventory.quantity + quantityChange;
+    if (newQuantity < 0) {
+      throw new ConvexError(
+        `Insufficient inventory for material ${materialId} in warehouse ${warehouseId}`
+      );
+    }
+    await ctx.db.patch(existingInventory._id, { quantity: newQuantity });
+  } else {
+    if (quantityChange < 0) {
+      throw new ConvexError(
+        `No existing inventory for material ${materialId} in warehouse ${warehouseId}`
+      );
+    }
+    await ctx.db.insert("inventories", {
+      warehouseId: warehouseId,
+      materialId: materialId,
+      quantity: quantityChange,
+    });
+  }
+}
+
+export const getInventoryByWarehouseId = query({
+  args: { warehouseId: v.id("warehouses") },
+  handler: async (ctx, args) => {
+    const inventories = await ctx.db
+      .query("inventories")
+      .withIndex("by_warehouse", (q) => q.eq("warehouseId", args.warehouseId))
+      .collect();
+
+    const inventoriesWithMaterialDetails = await Promise.all(
+      inventories.map(async (inventory) => {
+        const material = await ctx.db.get(inventory.materialId);
+
+        if (!material) {
+          return null;
+        }
+
+        return {
+          ...inventory,
+          material: {
+            _id: material._id,
+            name: material.name,
+            type: material.type,
+            imageFileId: material.imageFileId,
+          },
+        };
+      })
+    );
+
+    return inventoriesWithMaterialDetails;
+  },
+});
+
+// Define the type for a single inventory item
+type InventoryItem = {
+  materialId: Id<"materials">;
+  materialName: string;
+  quantity: number;
+  warehouseId: Id<"warehouses">;
+  imageUrl: string | null;
+  materialType: string | undefined;
+};
+
+export const getInventoryForDisplayByWarehouseId = query({
+  args: { warehouseId: v.id("warehouses") },
+  handler: async (ctx, args) => {
+    const inventories = await ctx.db
+      .query("inventories")
+      .withIndex("by_warehouse", (q) => q.eq("warehouseId", args.warehouseId))
+      .collect();
+
+    const inventoriesForDisplay: (InventoryItem | null)[] = await Promise.all(
+      inventories.map(async (inventory) => {
+        const material = await ctx.db.get(inventory.materialId);
+
+        if (!material) {
+          return null; // Return null if material doesn't exist
+        }
+
+        // Construct the image URL if imageFileId exists
+        const imageUrl = material.imageFileId
+          ? await ctx.storage.getUrl(material.imageFileId)
+          : null;
+
+        return {
+          materialId: inventory.materialId,
+          materialName: material.name,
+          quantity: inventory.quantity,
+          warehouseId: inventory.warehouseId,
+          imageUrl: imageUrl,
+          materialType: material.type ?? undefined,
+        };
+      })
+    );
+
+    return inventoriesForDisplay;
+  },
+});

@@ -4,7 +4,7 @@ import GenerateDocument from "../GenerateDocument";
 export default function Actions({
   movement,
 }: {
-  movement: Doc<"material_movements">;
+  movement: any;
 }) {
   return (
     <div className="flex items-center">

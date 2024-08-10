@@ -10,6 +10,7 @@ const schema = defineSchema({
     type: v.optional(v.string()),
     imageFileId: v.optional(v.id("_storage")),
     additionalAttributes: v.optional(v.any()),
+    currentVersionId: v.optional(v.id("materialVersions")),
   })
     .index("by_name", ["name"])
     .index("by_type", ["type"]),
@@ -22,15 +23,38 @@ const schema = defineSchema({
   transactions: defineTable({
     from_location: v.optional(v.id("warehouses")),
     to_location: v.optional(v.id("warehouses")),
-    action_type: v.string(), // 'added', 'transferred', 'deleted' (optional for tracking actions)
+    action_type: v.string(),
+    description: v.optional(v.string()), // 'added', 'transferred', 'deleted' (optional for tracking actions)
   }),
   transactions_details: defineTable({
     transaction: v.id("transactions"), // Foreign key to the transaction
-    material: v.id("materials"), // Foreign key to the material
+    materialId: v.id("materials"), // Foreign key to the material
+    materialVersionId: v.id("materialVersions"),
     quantity: v.number(), // Quantity of the material in this transaction
   })
     .index("by_transaction", ["transaction"]) // Index to quickly find all materials in a transaction
-    .index("by_material", ["material"]), // Index to quickly find all transactions for a material
+    .index("by_material", ["materialId"]), // Index to quickly find all transactions for a material
+  inventories: defineTable({
+    warehouseId: v.id("warehouses"),
+    materialId: v.id("materials"),
+    quantity: v.number(),
+  })
+    .index("by_warehouse", ["warehouseId"])
+    .index("by_material", ["materialId"])
+    .index("by_warehouse_and_material", ["warehouseId", "materialId"]),
+  material_audit_logs: defineTable({
+    materialId: v.id("materials"),
+    oldName: v.string(),
+    newName: v.string(),
+  }).index("by_material", ["materialId"]),
+  materialVersions: defineTable({
+    materialId: v.id("materials"),
+    name: v.string(),
+    type: v.optional(v.string()),
+    versionNumber: v.number(),
+  })
+    .index("by_material_and_version", ["materialId", "versionNumber"])
+    .index("by_material", ["materialId"]),
 });
 
 export default schema;

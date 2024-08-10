@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "../../../../../../../../convex/_generated/api";
-import { Doc, Id } from "../../../../../../../../convex/_generated/dataModel";
+import { Id } from "../../../../../../../../convex/_generated/dataModel";
 import { ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "convex/react";
 import { Package, PackageOpen } from "lucide-react";
@@ -33,12 +33,29 @@ function WarehouseName({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
   return warehouse!.name;
 }
 
-export const columns: ColumnDef<
-  Doc<"material_movements"> & {
-    toWarehouseName: string | undefined;
-    fromWarehouseName: string | undefined;
-  }
->[] = [
+
+type EnrichedTransaction = {
+  _creationTime: number;
+  _id: Id<"transactions">;
+  from_location?: Id<"warehouses">;
+  to_location?: Id<"warehouses">;
+  action_type: string;
+  materials: {
+    materialId: Id<"materials">;
+    materialVersionId: Id<"materialVersions">;
+    quantity: number;
+    materialName: string;
+    materialType: string | undefined;
+    materialImageFileId: Id<"_storage"> | undefined;
+    versionNumber: number;
+    versionCreationTime: number;
+  }[];
+  fromWarehouseId?: Id<"warehouses">;
+  toWarehouseId?: Id<"warehouses">;
+  description?: string;
+};
+
+export const columns: ColumnDef<EnrichedTransaction | null>[] = [
   {
     accessorKey: "Romaneio",
     header: "Romaneio",
@@ -50,7 +67,7 @@ export const columns: ColumnDef<
     accessorKey: "Data",
     header: "Data",
     cell: ({ row }) => {
-      const formattedDate = milisecondsToDate(row.original._creationTime);
+      const formattedDate = milisecondsToDate(row.original!._creationTime);
 
       return formattedDate;
     },
@@ -60,15 +77,11 @@ export const columns: ColumnDef<
     accessorKey: "Tipo",
     header: "Tipo",
     cell: ({ row }) => {
-      const status = types.find((status) => status.value === row.original.type);
-
-      if (!status) {
-        return null;
-      }
+      const type = row.original?.action_type
 
       return (
         <div className="flex w-[100px] items-center">
-          <span>{status.label}</span>
+          <span>{type}</span>
         </div>
       );
     },
@@ -81,27 +94,27 @@ export const columns: ColumnDef<
     accessorKey: "De",
     header: "De",
     cell: ({ row }) => {
-      if (!row.original.fromWarehouseId) {
+      if (!row.original!.fromWarehouseId) {
         return <Package size={22} strokeWidth={1} color="#0011ff" />;
       }
-      return <WarehouseName warehouseId={row.original.fromWarehouseId} />;
+      return <WarehouseName warehouseId={row.original!.fromWarehouseId} />;
     },
   },
   {
     accessorKey: "Para",
     header: "Para",
     cell: ({ row }) => {
-      if (!row.original.toWarehouseId) {
+      if (!row.original!.toWarehouseId) {
         return <PackageOpen color="#0011ff" strokeWidth={1} />;
       }
-      return <WarehouseName warehouseId={row.original.toWarehouseId} />;
+      return <WarehouseName warehouseId={row.original!.toWarehouseId} />;
     },
   },
   {
     accessorKey: "Materiais",
     header: "Qtd.",
     cell: ({ row }) => {
-      const quantities = row.original.materials.map((material) => ({
+      const quantities = row.original!.materials.map((material) => ({
         id: material.materialId,
         quantity: material.quantity,
       }));
@@ -120,7 +133,7 @@ export const columns: ColumnDef<
     accessorKey: "Nome",
     header: "Nome",
     cell: ({ row }) => {
-      const names = row.original.materials.map((material) => ({
+      const names = row.original!.materials.map((material) => ({
         name: material.materialName,
         id: material.materialId,
       }));
@@ -152,7 +165,7 @@ export const columns: ColumnDef<
     cell: ({ row }) => {
       return (
         <ScrollArea className="max-h-[200px] min-h-0 max-w-[500px] min-w-0  overflow-auto">
-          {row.original.description}
+          {row.original?.description}
         </ScrollArea>
       );
     },

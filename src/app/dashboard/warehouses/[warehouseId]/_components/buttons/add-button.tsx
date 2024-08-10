@@ -45,7 +45,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const materialSchema = z.object({
-  materialId: z.string(), // Assuming you are selecting by ID
+  materialId: z.string(),
   quantity: z.coerce.number().min(1),
 });
 
@@ -54,8 +54,8 @@ export function AddMaterialButton({
 }: {
   warehouseId: Id<"warehouses">;
 }) {
-  const addStockMovement = useMutation(api.material_movements.addStockMovement);
-  const materials = useQuery(api.materials.getCurrentMaterials);
+  const createTransaction = useMutation(api.inventories.updateInventory);
+  const materials = useQuery(api.materials.getMaterials);
   const [materialsList, setMaterialsList] = useState<
     {
       materialId: Id<"materials">;
@@ -85,7 +85,6 @@ export function AddMaterialButton({
     const { materialId, quantity } = getValues();
     const material = materials!.find((mat) => mat._id === materialId);
     if (material) {
-      // Check if materialId already exists in materialsList
       const isAlreadyAdded = materialsList.some(
         (item) => item.materialId === materialId
       );
@@ -100,27 +99,29 @@ export function AddMaterialButton({
           },
         ]);
       } else {
-        // Optionally, alert the user that the material has already been added
         console.log("Material already added.");
       }
-      reset({ materialId: "", quantity: 1 }); // Reset form fields
+      reset({ materialId: "", quantity: 1 });
     }
   };
 
   const onSubmit = async () => {
     try {
       const orderData = {
-        materials: materialsList,
+        materials: materialsList.map(({ materialId, quantity }) => ({
+          materialId,
+          quantity,
+        })),
         description: orderDescription,
-        toWarehouseId: warehouseId,
+        toWarehouse: warehouseId,
       };
 
-      await addStockMovement({
+      await createTransaction({
+        toWarehouse: orderData.toWarehouse,
+        actionType: "add",
         materials: orderData.materials,
         description: orderData.description,
-        toWarehouseId: orderData.toWarehouseId,
       });
-      // 3. Clear the form after submitting
 
       await fetch("https://projectplannerai.com/api/events", {
         method: "POST",
@@ -128,7 +129,7 @@ export function AddMaterialButton({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          key: "User created a movement", // any custom event you want to track
+          key: "User created a movement",
           projectId: "j57dma70tj3f57rsanrdjchtrd6pehgv",
         }),
       });
@@ -178,8 +179,8 @@ export function AddMaterialButton({
                           >
                             {field.value
                               ? materials.find(
-                                  (material) => material._id === field.value
-                                )?.name
+                                (material) => material._id === field.value
+                              )?.name
                               : "Selecione o material"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>

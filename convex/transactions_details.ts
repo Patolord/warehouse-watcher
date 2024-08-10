@@ -24,7 +24,7 @@ export const queryTransactionsDetailsByTransactionId = query({
     // Retrieve material details for each transactionsDetails entry
     const enrichedDetails = await Promise.all(
       transactionsDetails.map(async (detail) => {
-        const material = await ctx.db.get(detail.material);
+        const material = await ctx.db.get(detail.materialId);
         return {
           ...detail,
           materialName: material!.name,
