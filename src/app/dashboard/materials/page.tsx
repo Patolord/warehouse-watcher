@@ -9,7 +9,7 @@ import { CreateButton } from "./_components/create-button";
 import { DataTable } from "./_components/data-table";
 
 export default function MaterialsPage() {
-  const materials = useQuery(api.materials.getCurrentMaterialsWithImage);
+  const materials = useQuery(api.materials.getMaterialsWithImage);
   const isLoading = materials === undefined;
 
   return (

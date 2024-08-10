@@ -1,13 +1,14 @@
 "use client";
 
+import { SignInFormPassword } from "@/auth/SignInFormPassword";
 import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
-import { SignInWithPassword } from "./(auth)/SignIn";
+
 
 export function HeaderActions() {
   return (
     <>
       <Unauthenticated>
-        <SignInWithPassword />
+        <SignInFormPassword />
       </Unauthenticated>
 
       <Authenticated>Bom dia!</Authenticated>

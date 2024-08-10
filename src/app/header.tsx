@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
-import { SignOut } from "./(auth)/SignOut";
-import { SignInFormPassword } from "./(auth)/SignInForm";
+import { SignOut } from "../auth/SignOut";
+
 import {
   Dialog,
   DialogContent,
@@ -12,9 +12,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { SignInWithPassword } from "./(auth)/SignIn";
+
 import { ModeToggle } from "@/components/mode-toggle";
 import Link from "next/link";
+import { SignInFormPassword } from "@/auth/SignInFormPassword";
 
 export default function Header() {
   return (
@@ -41,7 +42,7 @@ export default function Header() {
                 <DialogHeader>
                   <DialogTitle>Sign in or create an account</DialogTitle>
                   <DialogDescription>
-                    <SignInWithPassword />
+                    <SignInFormPassword />
                   </DialogDescription>
                 </DialogHeader>
               </DialogContent>

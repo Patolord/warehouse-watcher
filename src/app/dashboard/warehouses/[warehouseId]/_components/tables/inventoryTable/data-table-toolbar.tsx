@@ -1,18 +1,17 @@
 "use client";
 
+import { api } from "../../../../../../../../convex/_generated/api";
 import { Table } from "@tanstack/react-table";
-
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useQuery } from "convex/react";
 
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
-import { useQuery } from "convex/react";
-import { api } from "../../../../../convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export const types = [
   {
-    label: "Boca de Ar",
-    value: "Boca de Ar",
+    label: "Animal",
+    value: "Animal",
   },
   {
     label: "Cobre",
@@ -41,12 +40,10 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
-  const types2 = useQuery(api.materials.getUniqueMaterialTypes);
+  let types2 = useQuery(api.materials.getUniqueMaterialTypes2);
 
-  const isLoading = !types2;
-
-  if (isLoading) {
-    return <div>Carregando...</div>;
+  if (!types2) {
+    types2 = [];
   }
 
   return (
@@ -54,17 +51,19 @@ export function DataTableToolbar<TData>({
       <div className="flex items-center py-4 gap-2">
         <Input
           placeholder="Filtrar materiais..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn("materialName")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table.getColumn("materialName")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
       </div>
       <div className="flex flex-1 items-center space-x-2">
-        {table.getColumn("type") && (
+        {table.getColumn("materialType") && (
           <DataTableFacetedFilter
-            column={table.getColumn("type")}
+            column={table.getColumn("materialType")}
             title="Tipo"
             options={types2}
           />

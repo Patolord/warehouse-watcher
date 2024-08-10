@@ -1,56 +1,50 @@
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
-import { UpdateCount } from "./metadata"
 
 export const createWarehouse = mutation({
-    args: {
-        name: v.string(),
-        address: v.optional(v.string()),
-    },
-    async handler(ctx, args) {
-        const sucess = await ctx.db.insert("warehouses", {
-            name: args.name,
-            address: args.address,
-        });
-
-        if (sucess) {
-            await UpdateCount(ctx, "warehouseCount", "increment");
-        }
-    },
+  args: {
+    name: v.string(),
+    address: v.optional(v.string()),
+  },
+  async handler(ctx, args) {
+    const sucess = await ctx.db.insert("warehouses", {
+      name: args.name,
+      address: args.address,
+    });
+  },
 });
 
 export const getWarehouses = query({
-    handler: async (ctx) => {
-        const Warehouses = await ctx.db.query("warehouses").collect();
+  handler: async (ctx) => {
+    const Warehouses = await ctx.db.query("warehouses").collect();
 
-        return Warehouses;
-    },
+    return Warehouses;
+  },
 });
 
 export const getWarehouseById = query({
-    args: { warehouseId: v.optional(v.id("warehouses")) },
-    handler: async (ctx, args) => {
-        if (args.warehouseId === undefined) {
-            return null;
-        }
-        const Warehouse = await ctx.db.get(args.warehouseId);
+  args: { warehouseId: v.optional(v.id("warehouses")) },
+  handler: async (ctx, args) => {
+    if (args.warehouseId === undefined) {
+      return null;
+    }
+    const Warehouse = await ctx.db.get(args.warehouseId);
 
-        return Warehouse;
-    },
+    return Warehouse;
+  },
 });
 
 export const countWarehousesTable = query({
-    handler: async (ctx) => {
-        const Warehouses = await ctx.db.query("warehouses").collect();
-        return Warehouses.length;
-    },
+  handler: async (ctx) => {
+    const Warehouses = await ctx.db.query("warehouses").collect();
+    return Warehouses.length;
+  },
 });
 
 export const deleteWarehouseById = mutation({
-    args: { warehouseId: v.id("warehouses") },
-    async handler(ctx, args) {
-        await ctx.db.delete(args.warehouseId);
-        await UpdateCount(ctx, "warehouseCount", "decrement");
-    },
+  args: { warehouseId: v.id("warehouses") },
+  async handler(ctx, args) {
+    await ctx.db.delete(args.warehouseId);
+  },
 });

@@ -2,8 +2,7 @@
 
 import { api } from "../../../../../convex/_generated/api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "convex/react";
-import { ConvexError } from "convex/values";
+import { useMutation } from "convex/react";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -29,30 +28,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { titleCase } from "@/lib/utils";
 
 const formSchema = z.object({
   name: z.string().min(3, {
-    message: "Nome deve conter no mínimo 3 caracteres",
+    message: "Nome deve conter no mínimo 3",
   }),
-  type: z.string().min(3, {
-    message: "Tipo deve conter no mínimo 3 caracteres",
-  }),
+  address: z.string(),
 });
 
-interface CreateButtonProps {
-  variantText:
-  | "link"
-  | "default"
-  | "destructive"
-  | "outline"
-  | "secondary"
-  | "ghost"
-  | null
-  | undefined;
-}
-
-export function CreateButton({ variantText }: CreateButtonProps) {
+export function CreateButton() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // 1. Define your form.
@@ -60,51 +44,34 @@ export function CreateButton({ variantText }: CreateButtonProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      type: "",
+      address: "",
     },
   });
 
-  const createMaterial = useMutation(api.materials.createMaterial);
-  const materialTypes = useQuery(api.materials.getUniqueMaterialTypes);
+  const createWarehouse = useMutation(api.warehouses.createWarehouse);
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const formattedMaterialName = titleCase(values.name);
-      const formattedType = titleCase(values.type);
+    await createWarehouse({
+      name: values.name,
+      address: values.address,
+    });
 
-      await createMaterial({
-        name: formattedMaterialName,
-        type: formattedType,
-      });
-
-      form.reset();
-      setIsDialogOpen(false);
-      toast.success("Material adicionado com sucesso.");
-    } catch (error) {
-      if (error instanceof ConvexError) {
-        if (error.data === "Material já existe") {
-          toast.error("Erro ao adicionar material, material já existe");
-        } else if (error.data === "User not authenticated") {
-          toast.error("Erro de autenticação, faça login novamente");
-        }
-      } else {
-        console.error("Error Inesperado:" + error);
-        toast.error("Erro inesperado.");
-      }
-    }
+    form.reset();
+    setIsDialogOpen(false);
+    toast.success("Estoque adicionado com sucesso.");
   }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant={variantText}>Cadastrar Novo Material</Button>
+        <Button>Adicionar Estoque</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Cadastrar Novo Material</DialogTitle>
+          <DialogTitle>Adicionar Estoque</DialogTitle>
           <DialogDescription>
-            Digite nome, tipo ou marca do material a ser cadastrado.
+            Digite nome e endereco do estoque a ser adicionado.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -127,19 +94,12 @@ export function CreateButton({ variantText }: CreateButtonProps) {
 
               <FormField
                 control={form.control}
-                name="type"
+                name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo</FormLabel>
+                    <FormLabel>Endereço</FormLabel>
                     <FormControl>
-                      <>
-                        <Input
-                          placeholder="Cobre, Grelha, Cabo, etc."
-                          list="material-types"
-                          {...field}
-                        />
-
-                      </>
+                      <Input placeholder="Endereço" {...field} />
                     </FormControl>
 
                     <FormMessage />

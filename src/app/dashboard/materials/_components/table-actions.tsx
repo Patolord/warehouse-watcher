@@ -1,21 +1,19 @@
 import { api } from "../../../../../convex/_generated/api";
 import { Doc } from "../../../../../convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { Pencil, Trash } from "lucide-react";
+import { Info, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 
 import EditSheet from "./edit-sheet";
 import { UploadModal } from "./upload-modal";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
+import Link from "next/link";
 
 export default function Actions({ material }: { material: Doc<"materials"> }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
-  const checkMaterialMovement = useQuery(api.materials.checkMaterialMovement, {
-    materialId: material._id,
-  });
-
+  const checkMaterialMovement = false
   const deleteMaterial = useMutation(api.materials.deleteMaterialById);
 
   return (
@@ -40,6 +38,10 @@ export default function Actions({ material }: { material: Doc<"materials"> }) {
           <Pencil size={18} />
         </Button>
         <UploadModal material={material} />
+
+        <Button size="xs" variant="ghost">
+          <Link href={`/dashboard/materials/${material._id}`}><Info /></Link>
+        </Button>
       </div>
     </>
   );

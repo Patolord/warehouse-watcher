@@ -12,7 +12,7 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "./ui/sheet";
-import CartForm from "@/app/(dashboard)/warehouses/[warehouseId]/_components/CartForm";
+import CartForm from "@/app/dashboard/warehouses/[warehouseId]/_components/CartForm";
 import { Button } from "@/components/ui/button";
 import {
   Table,

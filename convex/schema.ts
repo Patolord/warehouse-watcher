@@ -1,74 +1,59 @@
 import { defineSchema, defineTable } from "convex/server";
 import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { date } from "zod";
 
 const schema = defineSchema({
-    ...authTables,
-    suppliers: defineTable({
-        name: v.string(),
-        cnpj: v.optional(v.string()),
-        email: v.optional(v.string()),
-        address: v.optional(v.string()),
-    }),
-    materials: defineTable({
-        rootMaterialId: v.optional(v.id("materials")),
-        name: v.string(),
-        type: v.optional(v.string()),
-        imageFileId: v.optional(v.id("_storage")),
-        additionalAttributes: v.optional(v.any()),
-        nickname: v.optional(v.string()),
-        baseUnit: v.optional(v.string()),
-        endDate: v.optional(v.number()),
-        isCurrent: v.optional(v.boolean()),
-    })
-        .index("by_name", ["name"])
-        .index("by_type", ["type"]),
-    warehouses: defineTable({
-        name: v.string(),
-        address: v.optional(v.string()),
-        latitude: v.optional(v.float64()),
-        longitude: v.optional(v.float64()),
-    }),
-    inventories: defineTable({
-        warehouseId: v.id("warehouses"),
-        materialId: v.id("materials"),
-        materialName: v.string(),
-        quantity: v.number(),
-        minQuantity: v.optional(v.number()),
-    })
-        .index("by_material_id", ["materialId"])
-        .index("by_warehouse_id", ["warehouseId"])
-        .index("by_warehouse_material", ["warehouseId", "materialId"]),
-    material_movements: defineTable({
-        fromWarehouseId: v.optional(v.id("warehouses")),
-        toWarehouseId: v.optional(v.id("warehouses")),
-        materials: v.array(
-            v.object({
-                materialId: v.id("materials"),
-                materialName: v.string(),
-                quantity: v.number(),
-                unitId: v.optional(v.id("material_units")),
-            }),
-        ),
-        status: v.optional(v.string()),
-        type: v.string(),
-
-        description: v.optional(v.string()),
-    }).index("by_type", ["type"]),
-    material_movement_details: defineTable({
-        materialName: v.string(),
-        movementId: v.id("material_movements"), // Foreign key to material_movements table
-        materialId: v.id("materials"), // Foreign key to materials table
-        quantity: v.number(),
-        unitId: v.optional(v.id("material_units")),
-    }).index("by_movement_material", ["movementId", "materialId"]),
-
-    metadata: defineTable({
-        materialCount: v.number(),
-        warehouseCount: v.number(),
-        supplierCount: v.number(),
-        pricesCount: v.number(),
-    }),
+  ...authTables,
+  materials: defineTable({
+    name: v.string(),
+    type: v.optional(v.string()),
+    imageFileId: v.optional(v.id("_storage")),
+    additionalAttributes: v.optional(v.any()),
+  })
+    .index("by_name", ["name"])
+    .index("by_type", ["type"]),
+  warehouses: defineTable({
+    name: v.string(),
+    address: v.optional(v.string()),
+    latitude: v.optional(v.float64()),
+    longitude: v.optional(v.float64()),
+  }),
+  transactions: defineTable({
+    from_location: v.optional(v.id("warehouses")),
+    to_location: v.optional(v.id("warehouses")),
+    action_type: v.string(), // 'added', 'transferred', 'deleted' (optional for tracking actions)
+  }),
+  transactions_details: defineTable({
+    transaction: v.id("transactions"), // Foreign key to the transaction
+    material: v.id("materials"), // Foreign key to the material
+    quantity: v.number(), // Quantity of the material in this transaction
+  })
+    .index("by_transaction", ["transaction"]) // Index to quickly find all materials in a transaction
+    .index("by_material", ["material"]), // Index to quickly find all transactions for a material
 });
 
 export default schema;
+
+/*
+
+Warehouse 1 mn72bhxnypszp0gtg1zahk5nsx6ygzk4
+Warehouse 2 mn73s4desbq3taf2ztbzt9xmn16yfdsb
+Warehouse 3 mn76xqvrdfwc46n15n0ct97ht16yhv5v
+
+Material 1 kh7fqdemwyzs853dwba6bq9vmh6ygdcp
+Material 2 kh72cxy0qre6k4ctfchk53y0ks6yh9xc
+Material 3 kh72hbfpjsg6dfepbebhxxtreh6yhb33
+
+Transfer 1 ms79w4vmexbrtbwtn5g9d01g856yg0me
+Transfer 2 ms79q2zkghevs41dbv4snpnk196yhx0b
+Added 1    ms7cadyadp00b7ss994ggstkkx6yhbck
+Removed 1  ms7bk2pdnrr0r0qd84skn3k6nx6ygrvf
+
+
+
+
+
+
+
+*/
