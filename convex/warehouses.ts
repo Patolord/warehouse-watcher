@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
+import { popup } from "leaflet";
 
 export const createWarehouse = mutation({
   args: {
@@ -46,5 +47,34 @@ export const deleteWarehouseById = mutation({
   args: { warehouseId: v.id("warehouses") },
   async handler(ctx, args) {
     await ctx.db.delete(args.warehouseId);
+  },
+});
+
+type MapMarker = {
+  lat: number;
+  lng: number;
+  popup?: string;
+};
+
+export const getAllWarehousePositions = query({
+  handler: async (ctx): Promise<MapMarker[]> => {
+    const warehouses = await ctx.db.query("warehouses").collect();
+
+    const warehousePositions: MapMarker[] = warehouses
+      .map((warehouse): MapMarker | null => {
+        const { latitude, longitude, name } = warehouse;
+
+        if (typeof latitude === "number" && typeof longitude === "number") {
+          return {
+            lat: latitude,
+            lng: longitude,
+            popup: name || undefined,
+          };
+        }
+        return null;
+      })
+      .filter((position): position is MapMarker => position !== null);
+
+    return warehousePositions;
   },
 });

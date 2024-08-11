@@ -18,6 +18,7 @@ import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as inventories from "../inventories.js";
 import type * as material_audit_logs from "../material_audit_logs.js";
+import type * as material_versions from "../material_versions.js";
 import type * as materials from "../materials.js";
 import type * as transactions from "../transactions.js";
 import type * as transactions_details from "../transactions_details.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   inventories: typeof inventories;
   material_audit_logs: typeof material_audit_logs;
+  material_versions: typeof material_versions;
   materials: typeof materials;
   transactions: typeof transactions;
   transactions_details: typeof transactions_details;

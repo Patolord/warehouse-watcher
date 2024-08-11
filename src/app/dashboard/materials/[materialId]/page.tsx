@@ -25,6 +25,10 @@ export default function MaterialPage({
     materialId: params.materialId,
   });
 
+  const materialVersions = useQuery(api.material_versions.getMaterialVersionsByMaterialId, {
+    materialId: params.materialId,
+  });
+
   if (!material || !transactions) {
     return <MaterialPageSkeleton />;
   }
@@ -90,7 +94,7 @@ export default function MaterialPage({
           {!transactions ? (
             <TransactionsSkeleton />
           ) : transactions.length > 0 ? (
-            <ScrollArea className="h-[60vh]">
+            <ScrollArea className="h-[30vh]">
               <div className="space-y-4">
                 {transactions.map((transaction) => (
                   <Card key={transaction.transaction_id} className="overflow-hidden">
@@ -130,6 +134,39 @@ export default function MaterialPage({
           )}
         </CardContent>
       </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Names</CardTitle>
+          <CardDescription>
+            {materialVersions?.length || 0} transactions found for this material
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!materialVersions ? (
+            <TransactionsSkeleton />
+          ) : materialVersions.length > 0 ? (
+            <ScrollArea className="h-[30vh]">
+              <div className="space-y-4">
+                {materialVersions.map((version) => (
+                  <Card key={version._id} className="overflow-hidden">
+                    <div className="flex items-center p-4">
+
+                      {version.name || "No Action Type"} -
+                      {version.versionNumber} -
+                      {version._creationTime}
+
+
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </ScrollArea>
+          ) : (
+            <p className="text-center text-muted-foreground">No transactions found.</p>
+          )}
+        </CardContent>
+      </Card>
+
     </main>
   );
 }
