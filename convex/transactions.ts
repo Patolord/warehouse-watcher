@@ -179,3 +179,18 @@ export const getTransactionsForDisplayByWarehouseId = query({
     return enrichedTransactions;
   },
 });
+
+interface Transaction {
+  from: string;
+  to: string;
+}
+
+export const getAllTransactions = query({
+  handler: async (ctx): Promise<Transaction[]> => {
+    const transactions = await ctx.db.query("transactions").collect();
+    return transactions.map((t) => ({
+      from: t.from_location?.toString() ?? "",
+      to: t.to_location?.toString() ?? "",
+    }));
+  },
+});

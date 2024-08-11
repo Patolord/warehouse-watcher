@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useQuery } from 'convex/react';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
@@ -14,8 +13,24 @@ const MapComponent = dynamic(
     }
 );
 
+interface Warehouse {
+    id: string;
+    lat: number;
+    lng: number;
+    name: string;
+}
+
+interface Transaction {
+    id: string;
+    from: string;
+    to: string;
+    amount?: number;
+    date?: string;
+}
+
 const ClientMap = () => {
-    const warehousePositions = useQuery(api.warehouses.getAllWarehousePositions);
+    const warehouses = useQuery(api.warehouses.getAllWarehousePositions);
+    const allTransactions = useQuery(api.transactions.getAllTransactions);
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
@@ -24,11 +39,16 @@ const ClientMap = () => {
 
     if (!isClient) return null;
 
-    if (warehousePositions === undefined) return <div>Loading...</div>;
+    if (warehouses === undefined || allTransactions === undefined) return <div>Loading...</div>;
+
+    // Filter out any transactions with empty 'from' or 'to' fields
+    const validTransactions = allTransactions.filter(
+        (t): t is Transaction => t.from !== '' && t.to !== ''
+    );
 
     return (
         <div style={{ width: '100%' }}>
-            <MapComponent markers={warehousePositions} height="70vh" />
+            <MapComponent warehouses={warehouses} transactions={validTransactions} height="70vh" />
         </div>
     );
 };

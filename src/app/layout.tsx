@@ -7,7 +7,7 @@ import { ConvexClientProvider } from "./ConvexClientProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "./header";
-import 'leaflet/dist/leaflet.css'
+
 
 const inter = Inter({ subsets: ["latin"] });
 

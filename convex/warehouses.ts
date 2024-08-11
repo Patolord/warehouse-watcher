@@ -50,30 +50,32 @@ export const deleteWarehouseById = mutation({
   },
 });
 
-type MapMarker = {
+interface Warehouse {
+  id: string;
   lat: number;
   lng: number;
-  popup?: string;
-};
+  name: string;
+}
 
 export const getAllWarehousePositions = query({
-  handler: async (ctx): Promise<MapMarker[]> => {
+  handler: async (ctx): Promise<Warehouse[]> => {
     const warehouses = await ctx.db.query("warehouses").collect();
 
-    const warehousePositions: MapMarker[] = warehouses
-      .map((warehouse): MapMarker | null => {
-        const { latitude, longitude, name } = warehouse;
+    const warehousePositions: Warehouse[] = warehouses
+      .map((warehouse): Warehouse | null => {
+        const { _id, latitude, longitude, name } = warehouse;
 
         if (typeof latitude === "number" && typeof longitude === "number") {
           return {
+            id: _id.toString(),
             lat: latitude,
             lng: longitude,
-            popup: name || undefined,
+            name: name || "",
           };
         }
         return null;
       })
-      .filter((position): position is MapMarker => position !== null);
+      .filter((warehouse): warehouse is Warehouse => warehouse !== null);
 
     return warehousePositions;
   },
