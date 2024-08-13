@@ -16,28 +16,33 @@ import {
 import { ModeToggle } from "@/components/mode-toggle";
 import Link from "next/link";
 import { SignInFormPassword } from "@/auth/SignInFormPassword";
+import { Atom } from "lucide-react";
+import WarehouseWatcherLogo from "@/components/logo";
 
 export default function Header() {
   return (
-    <div className="z-10 relative dark:bg-slate-900 bg-slate-50 py-4">
+    <div className="z-10 relative dark:bg-slate-900 bg-slate-100 py-4 border">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex gap-12 items-center">
           <Link href="/">
-            <div>Warehouse Watcher </div>
+            <WarehouseWatcherLogo />
           </Link>
+          <Authenticated>
+            <nav>
+              <Link href="/dashboard/materials" className="hover:text-slate-400">
 
-          <nav>
-            <Link href="/dashboard/materials" className="hover:text-slate-400">
-              Dashboard
-            </Link>
-          </nav>
+              </Link>
+            </nav>
+          </Authenticated>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-8">
           <AuthLoading>Carregando...</AuthLoading>
           <Unauthenticated>
             <Dialog>
-              <DialogTrigger>Login</DialogTrigger>
+              <DialogTrigger asChild>
+                <Button variant="outline">Login</Button>
+              </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Sign in or create an account</DialogTitle>
@@ -49,11 +54,11 @@ export default function Header() {
             </Dialog>
           </Unauthenticated>
           <Authenticated>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-8">
               <SignOut />
             </div>
           </Authenticated>
-          <ModeToggle />
+
         </div>
       </div>
     </div>
