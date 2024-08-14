@@ -1,5 +1,5 @@
-import { Doc } from "../../../../../../../../convex/_generated/dataModel";
-import GenerateDocument from "../GenerateDocument";
+/* import { Doc } from "../../../../../../../../convex/_generated/dataModel";
+import GenerateDocument from "../GenerateDocument"; */
 
 export default function Actions({
   movement,
@@ -8,7 +8,7 @@ export default function Actions({
 }) {
   return (
     <div className="flex items-center">
-      <GenerateDocument movement={movement} />
+      TODO{/* <GenerateDocument movement={movement} /> */}
     </div>
   );
 }

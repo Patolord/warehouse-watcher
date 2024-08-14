@@ -16,7 +16,7 @@ export const Hero = () => {
             <p className="py-5 text-xl leading-normal text-gray-500 lg:text-xl xl:text-2xl dark:text-gray-300">
               Warehouse Watcher is a powerful, user-friendly inventory system
               that brings real-time updates to your fingertips. Designed for
-              both businesses and customers, it's the standalone solution
+              both businesses and customers, its the standalone solution
               that revolutionizes warehouse management.
             </p>
 

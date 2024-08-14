@@ -20,7 +20,7 @@ export default function Home() {
         title="Discover the Power of Real-Time Inventory Management"
       >
         Watch how Warehouse Watcher transforms your inventory process. With its
-        intuitive interface and real-time updates, you'll wonder how you ever
+        intuitive interface and real-time updates, youll wonder how you ever
         managed without it. See why our users are calling it a game-changer in
         warehouse management.
       </SectionTitle>

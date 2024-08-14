@@ -1,6 +1,6 @@
 "use client";
 
-import RevertButton from "../../buttons/revert-button";
+
 import { Table } from "@tanstack/react-table";
 
 import { DataTableFacetedFilter } from "./mov-data-table-fac-filter";
@@ -86,7 +86,7 @@ export function DataTableToolbar<TData>({
         </DropdownMenu>
       </div>
       <div>
-        <RevertButton />
+        Revert Button
       </div>
     </div>
   );
