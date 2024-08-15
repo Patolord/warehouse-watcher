@@ -22,6 +22,7 @@ import type * as material_versions from "../material_versions.js";
 import type * as materials from "../materials.js";
 import type * as transactions from "../transactions.js";
 import type * as transactions_details from "../transactions_details.js";
+import type * as types from "../types.js";
 import type * as users from "../users.js";
 import type * as warehouses from "../warehouses.js";
 
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   materials: typeof materials;
   transactions: typeof transactions;
   transactions_details: typeof transactions_details;
+  types: typeof types;
   users: typeof users;
   warehouses: typeof warehouses;
 }>;

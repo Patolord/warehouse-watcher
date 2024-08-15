@@ -49,34 +49,3 @@ export const deleteWarehouseById = mutation({
     await ctx.db.delete(args.warehouseId);
   },
 });
-
-interface Warehouse {
-  id: string;
-  lat: number;
-  lng: number;
-  name: string;
-}
-
-export const getAllWarehousePositions = query({
-  handler: async (ctx): Promise<Warehouse[]> => {
-    const warehouses = await ctx.db.query("warehouses").collect();
-
-    const warehousePositions: Warehouse[] = warehouses
-      .map((warehouse): Warehouse | null => {
-        const { _id, latitude, longitude, name } = warehouse;
-
-        if (typeof latitude === "number" && typeof longitude === "number") {
-          return {
-            id: _id.toString(),
-            lat: latitude,
-            lng: longitude,
-            name: name || "",
-          };
-        }
-        return null;
-      })
-      .filter((warehouse): warehouse is Warehouse => warehouse !== null);
-
-    return warehousePositions;
-  },
-});

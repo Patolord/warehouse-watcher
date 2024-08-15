@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import { Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
+import { TransactionWithWarehouseInfo } from "./types";
 
 export const queryTransactionById = query({
   args: { transactionId: v.id("transactions") },
@@ -192,5 +193,30 @@ export const getAllTransactions = query({
       from: t.from_location?.toString() ?? "",
       to: t.to_location?.toString() ?? "",
     }));
+  },
+});
+
+export const getTransactionsWithLocations = query({
+  args: {},
+  handler: async (ctx): Promise<TransactionWithWarehouseInfo[]> => {
+    const transactions = await ctx.db.query("transactions").collect();
+    const transactionsWithLocations = await Promise.all(
+      transactions.map(
+        async (transaction): Promise<TransactionWithWarehouseInfo> => {
+          const fromWarehouse = transaction.from_location
+            ? await ctx.db.get(transaction.from_location)
+            : null;
+          const toWarehouse = transaction.to_location
+            ? await ctx.db.get(transaction.to_location)
+            : null;
+          return {
+            ...transaction,
+            from_warehouse: fromWarehouse,
+            to_warehouse: toWarehouse,
+          };
+        }
+      )
+    );
+    return transactionsWithLocations;
   },
 });

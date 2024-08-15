@@ -1,19 +1,9 @@
-import { Id } from "../../../../convex/_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 
-export type Warehouse = {
-  _id: Id<"warehouses">;
-  _creationTime: number;
-  name: string;
-  address?: string;
-  latitude?: number;
-  longitude?: number;
-};
-
+export type Warehouse = Doc<"warehouses">;
 export type WarehouseId = Id<"warehouses">;
 
-export type Transaction = {
-  _id: Id<"transactions">;
-  _creationTime: number;
+export type Transaction = Doc<"transactions"> & {
   from_location?: WarehouseId;
   to_location?: WarehouseId;
   action_type: string;
@@ -25,9 +15,7 @@ export type TransactionWithWarehouseInfo = Transaction & {
   to_warehouse?: Warehouse | null;
 };
 
-export type TransactionDetails = {
-  _id: Id<"transactions_details">;
-  _creationTime: number;
+export type TransactionDetails = Doc<"transactions_details"> & {
   transaction: Id<"transactions">;
   materialId: Id<"materials">;
   materialVersionId: Id<"materialVersions">;
