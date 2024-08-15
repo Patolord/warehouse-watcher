@@ -4,7 +4,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Warehouse, TransactionWithWarehouseInfo } from './types';
 import dynamic from 'next/dynamic';
 import { mapConfig, createIcon } from './mapConfig';
-import { Warehouse as WarehouseIcon } from 'lucide-react';
+import { createMarkers } from './markerCreation';
+import { fitMapToMarkers } from './mapFitting';
+import { createTransactionPaths } from './pathCreation';
+import { injectAnimationCSS } from './utils';
+import {
+    addFitToMarkersControl,
+    addZoomControls,
+    addScaleControl,
+    addLayerControl,
+    addLegendControl
+} from './mapControls';
 
 interface WorldMapProps {
     locations: Warehouse[];
@@ -20,42 +30,44 @@ const WorldMap: React.FC<WorldMapProps> = ({ locations, transactions }) => {
             const initMap = async () => {
                 const L = (await import('leaflet')).default;
                 await import('leaflet-polylinedecorator');
-                const { createMarkers, fitMapToMarkers, createTransactionPaths, injectAnimationCSS } = await import('./mapMarkers');
 
-                injectAnimationCSS(); // Inject the CSS for animation
+                injectAnimationCSS();
 
                 if (!mapRef.current) {
-                    const map = L.map('map', mapConfig.initialView);
-                    L.tileLayer(mapConfig.tileLayer.url, {
+                    const map = L.map('map', {
+                        ...mapConfig.initialView,
+                        zoomControl: false
+                    });
+                    const baseLayer = L.tileLayer(mapConfig.tileLayer.url, {
                         attribution: mapConfig.tileLayer.attribution
                     }).addTo(map);
                     mapRef.current = map;
 
-                    // Apply grayscale filter
                     const mapContainer = map.getContainer();
                     mapContainer.style.filter = mapConfig.mapFilter;
-                }
 
-                const map = mapRef.current;
-                if (map) {
-                    map.eachLayer((layer) => {
-                        if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-                            layer.remove();
-                        }
-                    });
+                    const warehouseLayer = L.layerGroup().addTo(map);
+                    const transactionLayer = L.layerGroup().addTo(map);
 
-                    const markers = createMarkers(locations, map, createIcon);
-                    createTransactionPaths(transactions, map);
+                    // Add controls
+                    addFitToMarkersControl(map, locations);
+                    addZoomControls(map);
+                    addScaleControl(map);
+                    addLayerControl(map, baseLayer, warehouseLayer, transactionLayer);
+                    addLegendControl(map);
+
+                    createMarkers(locations, map, createIcon).forEach(marker => warehouseLayer.addLayer(marker));
+
+                    const transactionLayers = createTransactionPaths(transactions, map);
+                    transactionLayers.forEach(layer => transactionLayer.addLayer(layer));
+
                     fitMapToMarkers(map, locations);
 
-                    // Ensure the map fits its container after any size changes
                     setTimeout(() => {
                         map.invalidateSize();
                     }, 0);
 
                     setMapLoaded(true);
-                } else {
-                    console.error('Map failed to initialize');
                 }
             };
 
@@ -66,7 +78,4 @@ const WorldMap: React.FC<WorldMapProps> = ({ locations, transactions }) => {
     return <div id="map" className="h-full w-full rounded-lg overflow-hidden" />;
 };
 
-// Dynamically import the component with SSR disabled
-export default dynamic(() => Promise.resolve(WorldMap), {
-    ssr: false
-});
+export default dynamic(() => Promise.resolve(WorldMap), { ssr: false });

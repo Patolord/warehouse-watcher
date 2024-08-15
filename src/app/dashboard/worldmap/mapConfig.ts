@@ -16,7 +16,7 @@ export const mapConfig = {
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
   },
   // Apply a grayscale filter to the map
-  mapFilter: "grayscale(100%)",
+  mapFilter: "grayscale(50%)",
 };
 
 export const createIcon = (location: Warehouse): L.DivIcon => {
