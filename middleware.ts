@@ -1,6 +1,11 @@
-import { convexAuthNextjsMiddleware } from "@convex-dev/auth/nextjs/server";
+import {
+  convexAuthNextjsMiddleware,
+  createRouteMatcher,
+  isAuthenticatedNextjs,
+  nextjsMiddlewareRedirect,
+} from "@convex-dev/auth/nextjs/server";
 
-export default convexAuthNextjsMiddleware();
+export default convexAuthNextjsMiddleware((request) => {});
 
 export const config = {
   // The following matcher runs middleware on all routes

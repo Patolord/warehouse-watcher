@@ -9,10 +9,12 @@ import { CreateButton } from "./_components/create-button";
 import { DataTable } from "./_components/data-table";
 
 export default function MaterialsPage() {
+
   const materials = useQuery(api.materials.getMaterialsWithImage);
   const isLoading = materials === undefined;
 
-  return (
+  return (<>
+
     <div className="flex flex-1 py-4 h-screen sm:h-fit flex-col space-y-2 px-4">
       {isLoading && (
         <div className="flex flex-col gap-8 w-full items-center mt-12">
@@ -43,5 +45,8 @@ export default function MaterialsPage() {
         </div>
       )}
     </div>
+
+  </>
   );
+
 }

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
-import { SignOut } from "../auth/SignOut";
+
 
 import {
   Dialog,
@@ -13,11 +13,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { ModeToggle } from "@/components/mode-toggle";
 import Link from "next/link";
-import { SignInFormPassword } from "@/auth/SignInFormPassword";
+
 import { Atom } from "lucide-react";
 import WarehouseWatcherLogo from "@/components/logo";
+
 
 export default function Header() {
   return (
@@ -47,7 +47,7 @@ export default function Header() {
                 <DialogHeader>
                   <DialogTitle>Sign in or create an account</DialogTitle>
                   <DialogDescription>
-                    <SignInFormPassword />
+                    Sign In
                   </DialogDescription>
                 </DialogHeader>
               </DialogContent>
@@ -55,7 +55,7 @@ export default function Header() {
           </Unauthenticated>
           <Authenticated>
             <div className="flex items-center gap-8">
-              <SignOut />
+              Sign Out
             </div>
           </Authenticated>
 

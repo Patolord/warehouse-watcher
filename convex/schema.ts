@@ -1,7 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { date } from "zod";
 
 const schema = defineSchema({
   ...authTables,
