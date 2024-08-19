@@ -10,7 +10,10 @@ import { DataTable } from "./_components/data-table";
 
 export default function MaterialsPage() {
 
-  const materials = useQuery(api.materials.getMaterialsWithImage);
+  const materials = useQuery(api.materials.getMaterialsWithImageByUser, {
+    userId: "user1",
+  }
+  );
   const isLoading = materials === undefined;
 
   return (<>

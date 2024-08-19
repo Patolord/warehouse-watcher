@@ -37,6 +37,32 @@ export const getMaterialsWithImage = query({
   },
 });
 
+export const getMaterialsWithImageByUser = query({
+  args: { userId: v.string() },
+
+  handler: async (ctx, args) => {
+    let currentMaterials = await ctx.db
+      .query("materials")
+      .filter((q) => q.eq(q.field("userId"), args.userId))
+      .collect();
+
+    const currentMaterialsWithUrl = await Promise.all(
+      currentMaterials.map(async (material) => ({
+        ...material,
+        url: material.imageFileId
+          ? await ctx.storage.getUrl(material.imageFileId)
+          : null,
+      }))
+    );
+
+    const AlphabeticalMaterials = currentMaterialsWithUrl.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+
+    return AlphabeticalMaterials;
+  },
+});
+
 export const getUniqueMaterialTypes = query({
   handler: async (ctx) => {
     const materials = await ctx.db
@@ -103,6 +129,7 @@ export const createMaterial = mutation({
 
     // Create the main material record
     const materialId = await ctx.db.insert("materials", {
+      userId: "user1", // Uncomment if user authentication is implemented
       name,
       type,
       imageFileId,

@@ -25,6 +25,7 @@ export const updateInventory = mutation({
 
     // Create the transaction
     const transactionId = await ctx.db.insert("transactions", {
+      userId: "user1",
       from_location: fromWarehouse,
       to_location: toWarehouse,
       action_type: actionType,

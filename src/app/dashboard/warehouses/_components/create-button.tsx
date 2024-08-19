@@ -1,13 +1,13 @@
-"use client";
-
+import React, { useState, useCallback } from 'react';
 import { api } from "../../../../../convex/_generated/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import dynamic from 'next/dynamic';
+import debounce from 'lodash/debounce';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,49 +29,103 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+const MapSelector = dynamic(() => import('./MapSelector'), {
+  ssr: false,
+});
+
 const formSchema = z.object({
   name: z.string().min(3, {
-    message: "Nome deve conter no mínimo 3",
+    message: "Nome deve conter no mínimo 3 caracteres",
   }),
-  address: z.string(),
+  address: z.string().min(1, {
+    message: "Endereço é obrigatório",
+  }),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 export function CreateButton() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
 
-  // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       address: "",
+      latitude: -23.5505, // São Paulo coordinates as default
+      longitude: -46.6333,
     },
   });
 
   const createWarehouse = useMutation(api.warehouses.createWarehouse);
 
-  // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: FormValues) => {
     await createWarehouse({
       name: values.name,
       address: values.address,
+      latitude: values.latitude,
+      longitude: values.longitude,
     });
 
     form.reset();
     setIsDialogOpen(false);
     toast.success("Estoque adicionado com sucesso.");
-  }
+  };
+
+  const handleLocationChange = (lat: number, lng: number, address: string) => {
+    form.setValue('latitude', lat);
+    form.setValue('longitude', lng);
+    form.setValue('address', address);
+  };
+
+  const geocodeAddress = async (address: string) => {
+    setIsGeocoding(true);
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        handleLocationChange(parseFloat(lat), parseFloat(lon), address);
+      } else {
+        toast.error("Endereço não encontrado. Por favor, ajuste manualmente no mapa.");
+      }
+    } catch (error) {
+      console.error("Erro ao geocodificar o endereço:", error);
+      toast.error("Erro ao buscar o endereço. Por favor, ajuste manualmente no mapa.");
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
+
+  // Debounced version of geocodeAddress
+  const debouncedGeocodeAddress = useCallback(
+    debounce((address: string) => {
+      geocodeAddress(address);
+    }, 1000), // 1000ms delay
+    []
+  );
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newAddress = e.target.value;
+    form.setValue('address', newAddress);
+    if (newAddress.length > 3) { // Only geocode if address is longer than 3 characters
+      debouncedGeocodeAddress(newAddress);
+    }
+  };
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <Button>Adicionar Estoque</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Adicionar Estoque</DialogTitle>
           <DialogDescription>
-            Digite nome e endereco do estoque a ser adicionado.
+            Digite o nome e endereço do estoque, e ajuste a localização no mapa se necessário.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -84,9 +138,8 @@ export function CreateButton() {
                   <FormItem>
                     <FormLabel>Nome</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome" {...field} />
+                      <Input placeholder="Nome do estoque" {...field} />
                     </FormControl>
-
                     <FormMessage />
                   </FormItem>
                 )}
@@ -99,21 +152,37 @@ export function CreateButton() {
                   <FormItem>
                     <FormLabel>Endereço</FormLabel>
                     <FormControl>
-                      <Input placeholder="Endereço" {...field} />
+                      <Input
+                        placeholder="Endereço completo"
+                        {...field}
+                        onChange={handleAddressChange}
+                        disabled={isGeocoding}
+                      />
                     </FormControl>
-
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <FormItem>
+                <FormLabel>Localização</FormLabel>
+                <FormControl>
+                  <MapSelector
+                    latitude={form.watch('latitude')}
+                    longitude={form.watch('longitude')}
+                    onLocationChange={handleLocationChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             </div>
             <DialogFooter>
               <Button
                 type="submit"
-                disabled={form.formState.isSubmitting}
+                disabled={form.formState.isSubmitting || isGeocoding}
                 className="flex gap-1"
               >
-                {form.formState.isSubmitting && (
+                {(form.formState.isSubmitting || isGeocoding) && (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 )}
                 Salvar

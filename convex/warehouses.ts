@@ -1,17 +1,21 @@
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
-import { popup } from "leaflet";
 
 export const createWarehouse = mutation({
   args: {
     name: v.string(),
     address: v.optional(v.string()),
+    latitude: v.optional(v.number()),
+    longitude: v.optional(v.number()),
   },
   async handler(ctx, args) {
     const sucess = await ctx.db.insert("warehouses", {
+      userId: "user1",
       name: args.name,
       address: args.address,
+      latitude: args.latitude,
+      longitude: args.longitude,
     });
   },
 });
@@ -19,6 +23,18 @@ export const createWarehouse = mutation({
 export const getWarehouses = query({
   handler: async (ctx) => {
     const Warehouses = await ctx.db.query("warehouses").collect();
+
+    return Warehouses;
+  },
+});
+
+export const getWarehousesByUser = query({
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    const Warehouses = await ctx.db
+      .query("warehouses")
+      .filter((q) => q.eq(q.field("userId"), args.userId))
+      .collect();
 
     return Warehouses;
   },

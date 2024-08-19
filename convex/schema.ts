@@ -5,6 +5,7 @@ import { v } from "convex/values";
 const schema = defineSchema({
   ...authTables,
   materials: defineTable({
+    userId: v.string(),
     name: v.string(),
     type: v.optional(v.string()),
     imageFileId: v.optional(v.id("_storage")),
@@ -14,12 +15,14 @@ const schema = defineSchema({
     .index("by_name", ["name"])
     .index("by_type", ["type"]),
   warehouses: defineTable({
+    userId: v.string(),
     name: v.string(),
     address: v.optional(v.string()),
     latitude: v.optional(v.float64()),
     longitude: v.optional(v.float64()),
   }),
   transactions: defineTable({
+    userId: v.string(),
     from_location: v.optional(v.id("warehouses")),
     to_location: v.optional(v.id("warehouses")),
     action_type: v.string(),

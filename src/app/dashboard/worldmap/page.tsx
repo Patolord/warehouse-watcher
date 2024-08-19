@@ -13,19 +13,31 @@ const DynamicWorldMap = dynamic(() => import('./Worldmap'), {
 });
 
 const WarehousePage: React.FC = () => {
-    const warehouses = useQuery(api.warehouses.getWarehouses) as Warehouse[] | undefined;
+    // Assume we have a way to get the current user's ID
+    const currentUserId = 'user1'; // Replace with actual user ID retrieval
+
+    const userWarehouses = useQuery(api.warehouses.getWarehousesByUser, { userId: currentUserId }) as Warehouse[] | undefined;
+    const allWarehouses = useQuery(api.warehouses.getWarehouses) as Warehouse[] | undefined;
     const transactions = useQuery(api.transactions.getTransactionsWithLocations) as TransactionWithWarehouseInfo[] | undefined;
 
-    if (warehouses === undefined || transactions === undefined) {
+    if (userWarehouses === undefined || allWarehouses === undefined || transactions === undefined) {
         return <div className="h-full flex items-center justify-center">Loading data...</div>;
     }
+
+    const otherWarehouses = allWarehouses.filter(warehouse =>
+        !userWarehouses.some(userWarehouse => userWarehouse._id === warehouse._id)
+    );
 
     return (
         <div className="h-full flex flex-col p-4">
             <h1 className="text-2xl font-bold mb-4">Warehouse Locations and Transactions</h1>
             <div className="flex-1 bg-white rounded-lg border">
                 <div className="h-full">
-                    <DynamicWorldMap locations={warehouses} transactions={transactions} />
+                    <DynamicWorldMap
+                        userWarehouses={userWarehouses}
+                        otherWarehouses={otherWarehouses}
+                        transactions={transactions}
+                    />
                 </div>
             </div>
         </div>

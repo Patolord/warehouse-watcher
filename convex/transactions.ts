@@ -64,6 +64,8 @@ export const queryTransactionsContainingMaterial = query({
           from_location: transaction?.from_location,
           to_location: transaction?.to_location,
           action_type: transaction?.action_type,
+          _id: transaction?._id,
+          _creationTime: transaction?._creationTime,
         };
       })
     );

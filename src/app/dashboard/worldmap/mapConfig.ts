@@ -15,12 +15,14 @@ export const mapConfig = {
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
   },
-  // Apply a grayscale filter to the map
   mapFilter: "grayscale(50%)",
 };
 
-export const createIcon = (location: Warehouse): L.DivIcon => {
-  const color = getMarkerColor(location);
+export const createIcon = (
+  location: Warehouse,
+  type: "user" | "other"
+): L.DivIcon => {
+  const color = getMarkerColor(type);
 
   const iconHtml = ReactDOMServer.renderToString(
     React.createElement(WarehouseIcon, { color, size: 30 })
@@ -34,8 +36,6 @@ export const createIcon = (location: Warehouse): L.DivIcon => {
   });
 };
 
-export const getMarkerColor = (location: Warehouse): string => {
-  // You can implement logic here to return different colors based on location properties
-  // For now, we'll use a default color
-  return "#555555";
+export const getMarkerColor = (type: "user" | "other"): string => {
+  return type === "user" ? "#4CAF50" : "#FF5722";
 };

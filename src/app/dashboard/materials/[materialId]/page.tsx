@@ -11,6 +11,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ImageIcon, ArrowRightIcon, MoveIcon, PlusCircleIcon, MinusCircleIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import dynamic from 'next/dynamic';
+
 
 export default function MaterialPage({
   params,
@@ -134,6 +136,8 @@ export default function MaterialPage({
           )}
         </CardContent>
       </Card>
+
+
       <Card>
         <CardHeader>
           <CardTitle>Names</CardTitle>

@@ -4,7 +4,7 @@ import { Warehouse } from "./types";
 export const addFitToMarkersControl = (
   map: L.Map,
   locations: Warehouse[]
-): void => {
+): L.Control => {
   const FitToMarkersControl = L.Control.extend({
     options: {
       position: "topright",
@@ -29,8 +29,9 @@ export const addFitToMarkersControl = (
       return container;
     },
   });
-
-  map.addControl(new FitToMarkersControl());
+  const control = new FitToMarkersControl();
+  map.addControl(control);
+  return control;
 };
 
 const fitToMarkers = (map: L.Map, locations: Warehouse[]): void => {
@@ -67,17 +68,21 @@ export const addScaleControl = (map: L.Map): void => {
 export const addLayerControl = (
   map: L.Map,
   baseLayer: L.TileLayer,
-  warehouseLayer: L.LayerGroup,
+  userWarehouseLayer: L.LayerGroup,
+  otherWarehouseLayer: L.LayerGroup,
   transactionLayer: L.LayerGroup
-): void => {
+): L.Control.Layers => {
   const overlayMaps = {
-    Warehouses: warehouseLayer,
+    "User Warehouses": userWarehouseLayer,
+    "Other Warehouses": otherWarehouseLayer,
     Transactions: transactionLayer,
   };
 
-  L.control
-    .layers({ "Base Map": baseLayer }, overlayMaps, { position: "topright" })
-    .addTo(map);
+  const control = L.control.layers({ "Base Map": baseLayer }, overlayMaps, {
+    position: "topright",
+  });
+  control.addTo(map);
+  return control;
 };
 
 export const addLegendControl = (map: L.Map): void => {
@@ -90,8 +95,9 @@ export const addLegendControl = (map: L.Map): void => {
       const container = L.DomUtil.create("div", "info legend");
       container.innerHTML = `
         <h4>Legend</h4>
-        <div><span style="background-color: blue; width: 10px; height: 10px; display: inline-block;"></span> Warehouse</div>
-        <div><span style="background-color: red; width: 10px; height: 10px; display: inline-block;"></span> Transaction</div>
+        <div><span style="background-color: #4CAF50; width: 10px; height: 10px; display: inline-block;"></span> User Warehouse</div>
+        <div><span style="background-color: #FF5722; width: 10px; height: 10px; display: inline-block;"></span> Other Warehouse</div>
+        <div><span style="background-color: #2196F3; width: 10px; height: 10px; display: inline-block;"></span> Transaction</div>
       `;
       return container;
     },
