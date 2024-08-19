@@ -5,7 +5,7 @@ import { Benefits } from "@/app/_components/Benefits";
 import { Faq } from "@/app/_components/Faq";
 
 import { benefitOne, benefitTwo } from "@/app/_components/data";
-import { SignIn } from "./SignIn";
+import { SignIn } from "@/app/auth/SignIn";
 
 
 export default function Home() {
