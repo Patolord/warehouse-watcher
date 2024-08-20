@@ -1,24 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 import Link from "next/link";
 
-import { Atom } from "lucide-react";
 import WarehouseWatcherLogo from "@/components/logo";
-import { SignInDialog } from "./auth/SignInDialog";
-import { SignOutButton } from "./auth/SignOut";
+import { SignInDialog } from "@/auth/SignInDialog";
+import { SignOutButton } from "@/auth/SignOut";
 
 
 

@@ -2,7 +2,7 @@
 
 import { Authenticated, Unauthenticated } from "convex/react"
 import Link from "next/link"
-import { SignInDialog } from "../auth/SignInDialog"
+import { SignInDialog } from "../../auth/SignInDialog"
 import { GitHubLogo } from "@/components/GitHubLogo"
 import { Button } from "@/components/ui/button"
 
