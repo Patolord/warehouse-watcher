@@ -5,14 +5,16 @@ import { Benefits } from "@/app/_components/Benefits";
 import { Faq } from "@/app/_components/Faq";
 
 import { benefitOne, benefitTwo } from "@/app/_components/data";
-import { SignIn } from "@/app/auth/SignIn";
+
+import { SignInDialog } from "./auth/SignInDialog";
+
 
 
 export default function Home() {
   return (
     <Container>
       <Hero />
-      <SignIn />
+
       <Benefits data={benefitOne} />
       <Benefits imgPos="right" data={benefitTwo} />
 

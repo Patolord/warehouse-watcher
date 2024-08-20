@@ -17,6 +17,9 @@ import Link from "next/link";
 
 import { Atom } from "lucide-react";
 import WarehouseWatcherLogo from "@/components/logo";
+import { SignInDialog } from "./auth/SignInDialog";
+import { SignOutButton } from "./auth/SignOut";
+
 
 
 export default function Header() {
@@ -32,6 +35,7 @@ export default function Header() {
               <Link href="/dashboard/materials" className="hover:text-slate-400">
 
               </Link>
+
             </nav>
           </Authenticated>
         </div>
@@ -39,23 +43,11 @@ export default function Header() {
         <div className="flex items-center gap-8">
           <AuthLoading>Carregando...</AuthLoading>
           <Unauthenticated>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline">Login</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Sign in or create an account</DialogTitle>
-                  <DialogDescription>
-                    Sign In
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
+            <SignInDialog />
           </Unauthenticated>
           <Authenticated>
             <div className="flex items-center gap-8">
-              Sign Out
+              <SignOutButton />
             </div>
           </Authenticated>
 
