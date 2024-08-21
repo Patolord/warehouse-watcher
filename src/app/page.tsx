@@ -6,7 +6,6 @@ import { Faq } from "@/app/_components/Faq";
 
 import { benefitOne, benefitTwo } from "@/app/_components/data";
 
-import { SignInDialog } from "../auth/SignInDialog";
 
 
 

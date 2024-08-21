@@ -24,12 +24,10 @@ export default async function RootLayout({
 
   return (
     <ConvexAuthNextjsServerProvider>
-      <html lang='en' className="h-full">
-        <body className={`${inter.className} flex flex-col h-full`}>
+      <html lang='en'>
+        <body className={`${inter.className}`}>
           <ConvexClientProvider>
             <NextTopLoader />
-
-
             <ThemeProvider
               attribute="class"
               defaultTheme="light"
@@ -37,11 +35,8 @@ export default async function RootLayout({
               disableTransitionOnChange
             >
               <Header />
-              <main className="flex-1 overflow-auto">
-                {children}
-              </main>
+              {children}
             </ThemeProvider>
-
           </ConvexClientProvider>
         </body>
       </html>

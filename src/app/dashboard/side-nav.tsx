@@ -45,10 +45,10 @@ export default function SideNav() {
       <div
         className={cn(
           isSidebarExpanded ? "w-[200px]" : "w-[68px]",
-          "border-r transition-all duration-300 ease-in-out transform hidden sm:flex h-full  bg-accent"
+          "border-r transition-all duration-300 ease-in-out transform hidden sm:flex h-full bg-accent"
         )}
       >
-        <aside className="flex h-full flex-col w-full break-words px-4   overflow-x-hidden columns-1">
+        <aside className="flex flex-col w-full break-words px-4   overflow-x-hidden h-full columns-1">
           {/* Top */}
           <div className="mt-4 relative pb-2 ">
             <div className="flex flex-col space-y-1">

@@ -12,7 +12,7 @@ const WarehouseWatcherLogo = () => {
       </div>
       <div className="relative flex-grow">
         <div className="absolute -left-2 top-0 w-[calc(100%+1rem)] h-full bg-blue-600 transform -skew-x-12"></div>
-        <div className="relative z-10 px-3 py-0.5 h-full flex flex-col justify-center">
+        <div className="relative px-3 py-1 flex flex-col justify-center">
           <span className="text-white font-bold text-lg block leading-tight">WAREHOUSE</span>
           <div className="flex items-center gap-2">
             <div className="flex-grow h-px bg-white"></div>

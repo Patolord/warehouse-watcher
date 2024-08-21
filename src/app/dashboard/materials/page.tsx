@@ -70,7 +70,7 @@ export default function MaterialsPage() {
             />
           )}
           {isDesktop ? (
-            <div className="container mx-auto">
+            <div className=" mx-auto">
               <DataTable columns={columns} data={materials} />
             </div>
           ) : (
