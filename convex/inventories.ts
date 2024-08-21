@@ -8,6 +8,7 @@ import {
   ActionCtx,
 } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
+import { getUserId } from "./embeddings";
 
 export const updateInventory = mutation({
   args: {
@@ -30,9 +31,11 @@ export const updateInventory = mutation({
   handler: async (ctx, args) => {
     const { fromWarehouse, toWarehouse, actionType, materials } = args;
 
+    const userId = await getUserId(ctx);
+
     // Create the transaction
     const transactionId = await ctx.db.insert("transactions", {
-      userId: "user1",
+      userId: userId,
       from_location: fromWarehouse,
       to_location: toWarehouse,
       action_type: actionType,
@@ -108,6 +111,7 @@ export const updateInventory = mutation({
     // Create the transaction embedding
     await createTransactionEmbedding(
       ctx,
+      userId,
       transactionId,
       actionType,
       fromWarehouse,
@@ -121,6 +125,7 @@ export const updateInventory = mutation({
 
 async function createTransactionEmbedding(
   ctx: MutationCtx,
+  userId: string,
   transactionId: Id<"transactions">,
   actionType: string,
   fromWarehouse: Id<"warehouses"> | undefined,
@@ -162,6 +167,7 @@ async function createTransactionEmbedding(
   `;
 
   await ctx.scheduler.runAfter(0, internal.embeddings.createEmbedding, {
+    userId,
     sourceId: transactionId,
     sourceType: "transaction",
     text: transactionText,

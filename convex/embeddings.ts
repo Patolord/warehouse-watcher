@@ -5,6 +5,7 @@ import {
   internalAction,
   internalMutation,
   query,
+  QueryCtx,
 } from "./_generated/server";
 import OpenAI from "openai";
 import { api, internal } from "./_generated/api";
@@ -24,6 +25,7 @@ async function embed(text: string) {
 
 export const setEmbedding = internalMutation({
   args: {
+    userId: v.string(),
     sourceId: v.union(
       v.id("materials"),
       v.id("warehouses"),
@@ -37,18 +39,14 @@ export const setEmbedding = internalMutation({
     embedding: v.array(v.float64()),
     textContent: v.string(),
   },
-  async handler(ctx, args) {
-    await ctx.db.insert("embeddings", {
-      sourceId: args.sourceId,
-      sourceType: args.sourceType,
-      embedding: args.embedding,
-      textContent: args.textContent,
-    });
+  handler: async (ctx, args) => {
+    await ctx.db.insert("embeddings", args);
   },
 });
 
 export const createEmbedding = internalAction({
   args: {
+    userId: v.string(),
     sourceId: v.union(
       v.id("materials"),
       v.id("warehouses"),
@@ -61,9 +59,10 @@ export const createEmbedding = internalAction({
     ),
     text: v.string(),
   },
-  async handler(ctx, args) {
+  handler: async (ctx, args) => {
     const embedding = await embed(args.text);
     await ctx.runMutation(internal.embeddings.setEmbedding, {
+      userId: args.userId,
       sourceId: args.sourceId,
       sourceType: args.sourceType,
       embedding,
@@ -84,27 +83,54 @@ export const searchSimilar = query({
     ),
   },
   handler: async (ctx, args) => {
-    // Assuming we have an embeddings table in our schema
-    const embeddings = await ctx.db
-      .query("embeddings")
-      .withIndex("by_source", (q) =>
-        args.sourceType ? q.eq("sourceType", args.sourceType) : q
-      )
-      .collect();
+    const userId = await getUserId(ctx);
+    const queryEmbedding = await embed(args.query);
 
-    // Here we would normally compute the embedding for the query
-    // and compare it with the stored embeddings.
-    // For this example, we'll just return the first 5 embeddings.
-    const results = embeddings.slice(0, 5).map((embedding) => ({
-      sourceId: embedding.sourceId,
-      sourceType: embedding.sourceType,
-      textContent: embedding.textContent,
-      similarity: Math.random(), // Placeholder for actual similarity calculation
-    }));
+    let embeddingsQuery = ctx.db
+      .query("embeddings")
+      .withIndex("by_user", (q) => q.eq("userId", userId));
+
+    if (args.sourceType) {
+      embeddingsQuery = embeddingsQuery.filter((q) =>
+        q.eq(q.field("sourceType"), args.sourceType)
+      );
+    }
+
+    const allEmbeddings = await embeddingsQuery.collect();
+
+    const similarItems = allEmbeddings
+      .map((item) => ({
+        ...item,
+        similarity: cosineSimilarity(queryEmbedding, item.embedding),
+      }))
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 5);
+
+    const results = await Promise.all(
+      similarItems.map(async (item) => {
+        const source = await ctx.db.get(item.sourceId);
+        return {
+          ...source,
+          similarity: item.similarity,
+          textContent: item.textContent,
+        };
+      })
+    );
 
     return results;
   },
 });
+
+// Helper function to get the user ID (implement this based on your authentication system)
+export async function getUserId(ctx: QueryCtx): Promise<string> {
+  // Implement this based on your authentication system
+  // For example, if you're using Convex authentication:
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    throw new Error("Not authenticated");
+  }
+  return identity.subject;
+}
 
 function cosineSimilarity(vec1: number[], vec2: number[]): number {
   const dotProduct = vec1.reduce((sum, val, i) => sum + val * vec2[i], 0);

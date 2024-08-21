@@ -133,7 +133,7 @@ export const createMaterial = mutation({
 
     // Create the main material record
     const materialId = await ctx.db.insert("materials", {
-      userId: userId, // Uncomment if user authentication is implemented
+      userId: userId,
       name,
       type,
       imageFileId,
@@ -153,6 +153,7 @@ export const createMaterial = mutation({
 
     const materialText = `${name} ${type || ""}. ${JSON.stringify(additionalAttributes) || ""}`;
     await ctx.scheduler.runAfter(0, internal.embeddings.createEmbedding, {
+      userId,
       sourceId: materialId,
       sourceType: "material",
       text: materialText,

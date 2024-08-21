@@ -27,10 +27,13 @@ export const createWarehouse = mutation({
 
     const warehouseText = `${args.name}. Located at: ${args.address || ""}. Coordinates: ${args.latitude}, ${args.longitude}`;
     await ctx.scheduler.runAfter(0, internal.embeddings.createEmbedding, {
+      userId,
       sourceId: warehouseId,
       sourceType: "warehouse",
       text: warehouseText,
     });
+
+    return warehouseId;
   },
 });
 
