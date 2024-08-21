@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useQuery } from 'convex/react';
-
 import dynamic from 'next/dynamic';
 import { Warehouse, TransactionWithWarehouseInfo } from './types';
 import { api } from '../../../../convex/_generated/api';
@@ -12,25 +11,19 @@ const DynamicWorldMap = dynamic(() => import('./Worldmap'), {
     loading: () => <p>Loading map...</p>
 });
 
-
-
 const WarehousePage: React.FC = () => {
+    const viewer = useQuery(api.users.viewer);
+    const userWarehouses = useQuery(api.warehouses.getWarehousesByUser, { userId: viewer?._id ?? '' });
+    const allWarehouses = useQuery(api.warehouses.getWarehouses);
+    const transactions = useQuery(api.transactions.getTransactionsWithLocations);
 
-    const viewer = useQuery(api.users.viewer, {});
     if (!viewer) {
-        <p>loading</p>
+        return <div className="h-full flex items-center justify-center">Loading user data...</div>;
     }
 
-    // Assume we have a way to get the current user's ID
-    const currentUserId = viewer?._id; // Replace with actual user ID retrieval
-
-    if (!currentUserId) {
-        return <div className="h-full flex items-center justify-center">No user ID found
-        </div>;
+    if (!viewer._id) {
+        return <div className="h-full flex items-center justify-center">No user ID found</div>;
     }
-    const userWarehouses = useQuery(api.warehouses.getWarehousesByUser, { userId: currentUserId }) as Warehouse[] | undefined;
-    const allWarehouses = useQuery(api.warehouses.getWarehouses) as Warehouse[] | undefined;
-    const transactions = useQuery(api.transactions.getTransactionsWithLocations) as TransactionWithWarehouseInfo[] | undefined;
 
     if (userWarehouses === undefined || allWarehouses === undefined || transactions === undefined) {
         return <div className="h-full flex items-center justify-center">Loading data...</div>;
@@ -46,9 +39,9 @@ const WarehousePage: React.FC = () => {
             <div className="flex-1 bg-white rounded-lg border">
                 <div className="h-full">
                     <DynamicWorldMap
-                        userWarehouses={userWarehouses}
+                        userWarehouses={userWarehouses as Warehouse[]}
                         otherWarehouses={otherWarehouses}
-                        transactions={transactions}
+                        transactions={transactions as TransactionWithWarehouseInfo[]}
                     />
                 </div>
             </div>
