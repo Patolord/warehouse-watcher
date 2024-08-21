@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { SignInFormPasswordAndResetViaCode } from './SignInFormPasswordAndResetViaCode';
+import { Separator } from '@/components/ui/separator';
 import { SignInWithGitHub } from './SignInWithGithub';
-import { SignInWithPassword } from './SignInWithPassword';
 
 export function SignInDialog({ className }: { className?: string }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -28,26 +28,11 @@ export function SignInDialog({ className }: { className?: string }) {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Sign In</DialogTitle>
-                    <DialogDescription>
-                        Choose your preferred method to sign in or create an account.
-                    </DialogDescription>
+                    <DialogTitle></DialogTitle>
                 </DialogHeader>
-                <Tabs defaultValue="password" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="password">Password</TabsTrigger>
-                        <TabsTrigger value="github">GitHub</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="password">
-                        <SignInWithPassword
-                            handleSent={handleSent}
-                            handlePasswordReset={handlePasswordReset}
-                        />
-                    </TabsContent>
-                    <TabsContent value="github">
-                        <SignInWithGitHub />
-                    </TabsContent>
-                </Tabs>
+                <SignInFormPasswordAndResetViaCode />
+                <Separator />
+                <SignInWithGitHub />
             </DialogContent>
         </Dialog>
     );

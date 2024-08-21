@@ -8,8 +8,11 @@ import {
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 
 export default convexAuthNextjsMiddleware((request) => {
+  if (!isProtectedRoute(request) && isAuthenticatedNextjs()) {
+    return nextjsMiddlewareRedirect(request, "/dashboard");
+  }
   if (isProtectedRoute(request) && !isAuthenticatedNextjs()) {
-    return nextjsMiddlewareRedirect(request, "/signin");
+    return nextjsMiddlewareRedirect(request, "/");
   }
 });
 

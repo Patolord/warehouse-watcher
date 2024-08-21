@@ -7,6 +7,7 @@ import { ConvexClientProvider } from "./ConvexClientProvider";
 import Header from "./header";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
+import NextTopLoader from 'nextjs-toploader';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,8 @@ export default async function RootLayout({
       <html lang='en' className="h-full">
         <body className={`${inter.className} flex flex-col h-full`}>
           <ConvexClientProvider>
+            <NextTopLoader />
+
 
             <ThemeProvider
               attribute="class"
