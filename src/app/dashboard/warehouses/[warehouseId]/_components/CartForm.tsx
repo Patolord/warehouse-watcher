@@ -113,6 +113,12 @@ export default function CartForm({
         description: values.description,
       });
 
+      await fetch("https://projectplannerai.com/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "User realized a transaction", projectId: "j5742cwe4q0jd7ga6qwbb827r56sm1n7" }),
+      });
+
       toast.success(values.consumeHere ? "Materiais consumidos com sucesso!" : "Transferência realizada com sucesso!");
       reset();
     } catch (error) {
