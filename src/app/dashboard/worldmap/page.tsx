@@ -12,18 +12,10 @@ const DynamicWorldMap = dynamic(() => import('./Worldmap'), {
 });
 
 const WarehousePage: React.FC = () => {
-    const viewer = useQuery(api.users.viewer);
-    const userWarehouses = useQuery(api.warehouses.getWarehousesByUser, { userId: viewer?._id ?? '' });
+    const userWarehouses = useQuery(api.warehouses.getWarehousesByUser)
     const allWarehouses = useQuery(api.warehouses.getWarehouses);
     const transactions = useQuery(api.transactions.getTransactionsWithLocations);
 
-    if (!viewer) {
-        return <div className="h-full flex items-center justify-center">Loading user data...</div>;
-    }
-
-    if (!viewer._id) {
-        return <div className="h-full flex items-center justify-center">No user ID found</div>;
-    }
 
     if (userWarehouses === undefined || allWarehouses === undefined || transactions === undefined) {
         return <div className="h-full flex items-center justify-center">Loading data...</div>;

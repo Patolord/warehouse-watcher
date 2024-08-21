@@ -35,11 +35,16 @@ export const getWarehouses = query({
 });
 
 export const getWarehousesByUser = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+
+    if (!userId) {
+      throw new ConvexError("Not authenticated");
+    }
+
     const Warehouses = await ctx.db
       .query("warehouses")
-      .filter((q) => q.eq(q.field("userId"), args.userId))
+      .filter((q) => q.eq(q.field("userId"), userId))
       .collect();
 
     return Warehouses;
