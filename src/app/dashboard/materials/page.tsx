@@ -4,7 +4,6 @@ import { api } from "../../../../convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Loader2 } from "lucide-react";
 import { useState, useMemo } from "react";
-import { FixedSizeList as List } from 'react-window';
 
 import { columns } from "./_components/columns";
 import { CreateButton } from "./_components/create-button";
@@ -13,9 +12,6 @@ import MaterialCard from "./_components/material-card";
 import SearchFilterControls from "./_components/search";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { types } from "./_components/data-table-toolbar";
-import { Badge } from "@/components/ui/badge";
-
-const CARD_HEIGHT = 170; // Adjust this based on your card's actual height
 
 export default function MaterialsPage() {
   const materials = useQuery(api.materials.getMaterialsWithImageByUser);
@@ -34,12 +30,6 @@ export default function MaterialsPage() {
   }, [materials, mobileSearchTerm, mobileSelectedType, isDesktop]);
 
   const isLoading = materials === undefined;
-
-  const renderCard = ({ index, style }: { index: number; style: React.CSSProperties }) => (
-    <div style={style}>
-      <MaterialCard material={filteredMobileMaterials[index]} />
-    </div>
-  );
 
   const renderContent = () => {
     if (isLoading) {
@@ -70,18 +60,15 @@ export default function MaterialsPage() {
             />
           )}
           {isDesktop ? (
-            <div className=" mx-auto">
+            <div className="container mx-auto">
               <DataTable columns={columns} data={materials} />
             </div>
           ) : (
-            <List
-              height={window.innerHeight - 240} // Adjust this value based on your layout
-              itemCount={filteredMobileMaterials.length}
-              itemSize={CARD_HEIGHT}
-              width="100%"
-            >
-              {renderCard}
-            </List>
+            <div className="space-y-4">
+              {filteredMobileMaterials.map((material, index) => (
+                <MaterialCard key={index} material={material} />
+              ))}
+            </div>
           )}
         </>
       );
@@ -96,7 +83,7 @@ export default function MaterialsPage() {
   };
 
   return (
-    <div className="flex flex-1 py-4 h-screen sm:h-fit flex-col space-y-2 px-4">
+    <div>
       {renderContent()}
     </div>
   );
