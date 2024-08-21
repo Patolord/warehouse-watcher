@@ -25,7 +25,19 @@ const MapSelector: React.FC<MapSelectorProps> = ({ latitude, longitude, onLocati
         try {
             const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
             const data = await response.json();
-            return data.display_name || '';
+
+            // Extract relevant parts of the address
+            const street = data.address.road || '';
+            const houseNumber = data.address.house_number || '';
+            const city = data.address.city || data.address.town || data.address.village || '';
+
+            // Combine parts into a simplified address
+            const simplifiedAddress = [
+                street && houseNumber ? `${street}, ${houseNumber}` : street || houseNumber,
+                city
+            ].filter(Boolean).join(', ');
+
+            return simplifiedAddress || data.display_name || '';
         } catch (error) {
             console.error("Error in reverse geocoding:", error);
             return '';

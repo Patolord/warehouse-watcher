@@ -27,7 +27,8 @@ const materialSchema = z.object({
 
 export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
   const createTransaction = useMutation(api.inventories.updateInventory);
-  const materials = useQuery(api.materials.getMaterials);
+
+  const materials = useQuery(api.materials.getMaterialsByUser);
   const [materialsList, setMaterialsList] = useState<{ materialId: Id<"materials">; materialName: string; quantity: number }[]>([]);
   const [orderDescription, setOrderDescription] = useState("");
   const [open, setOpen] = useState(false);

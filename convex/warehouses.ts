@@ -1,5 +1,5 @@
-import { v } from "convex/values";
-
+import { ConvexError, v } from "convex/values";
+import { auth } from "./auth";
 import { mutation, query } from "./_generated/server";
 
 export const createWarehouse = mutation({
@@ -10,8 +10,14 @@ export const createWarehouse = mutation({
     longitude: v.optional(v.number()),
   },
   async handler(ctx, args) {
+    const userId = await auth.getUserId(ctx);
+
+    if (!userId) {
+      throw new ConvexError("Not authenticated");
+    }
+
     const sucess = await ctx.db.insert("warehouses", {
-      userId: "user1",
+      userId: userId,
       name: args.name,
       address: args.address,
       latitude: args.latitude,

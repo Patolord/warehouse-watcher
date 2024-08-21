@@ -11,9 +11,13 @@ import WarehouseCard from "./_components/warehouse-card";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 export default function WarehousesPage() {
+  const viewer = useQuery(api.users.viewer, {});
+
+  if (!viewer) return null;
   const warehouses = useQuery(api.warehouses.getWarehousesByUser,
-    { userId: "user1" }
+    { userId: viewer?._id }
   );
+
   const isLoading = warehouses === undefined;
   const isDesktop = useMediaQuery("(min-width: 768px)");
 

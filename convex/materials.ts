@@ -3,11 +3,17 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
 import { queryTransactionsContainingMaterial } from "./transactions";
+import { auth } from "./auth";
 
 //queries
-export const getMaterials = query({
+export const getMaterialsByUser = query({
   handler: async (ctx) => {
-    const materials = await ctx.db.query("materials").collect();
+    const userId = await auth.getUserId(ctx);
+
+    const materials = await ctx.db
+      .query("materials")
+      .filter((q) => q.eq(q.field("userId"), userId))
+      .collect();
     const AlphabeticalMaterials = materials.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
@@ -38,12 +44,12 @@ export const getMaterialsWithImage = query({
 });
 
 export const getMaterialsWithImageByUser = query({
-  args: { userId: v.string() },
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
 
-  handler: async (ctx, args) => {
     let currentMaterials = await ctx.db
       .query("materials")
-      .filter((q) => q.eq(q.field("userId"), args.userId))
+      .filter((q) => q.eq(q.field("userId"), userId))
       .collect();
 
     const currentMaterialsWithUrl = await Promise.all(
@@ -107,13 +113,10 @@ export const createMaterial = mutation({
     additionalAttributes: v.optional(v.any()),
   },
   async handler(ctx, args) {
-    // Uncomment the following block if you want to re-enable authentication
-    /*
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) {
       throw new ConvexError("User not authenticated");
     }
-    */
 
     const { name, type, imageFileId, additionalAttributes } = args;
 
@@ -129,7 +132,7 @@ export const createMaterial = mutation({
 
     // Create the main material record
     const materialId = await ctx.db.insert("materials", {
-      userId: "user1", // Uncomment if user authentication is implemented
+      userId: userId, // Uncomment if user authentication is implemented
       name,
       type,
       imageFileId,

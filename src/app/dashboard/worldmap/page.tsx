@@ -12,10 +12,22 @@ const DynamicWorldMap = dynamic(() => import('./Worldmap'), {
     loading: () => <p>Loading map...</p>
 });
 
-const WarehousePage: React.FC = () => {
-    // Assume we have a way to get the current user's ID
-    const currentUserId = 'user1'; // Replace with actual user ID retrieval
 
+
+const WarehousePage: React.FC = () => {
+
+    const viewer = useQuery(api.users.viewer, {});
+    if (!viewer) {
+        <p>loading</p>
+    }
+
+    // Assume we have a way to get the current user's ID
+    const currentUserId = viewer?._id; // Replace with actual user ID retrieval
+
+    if (!currentUserId) {
+        return <div className="h-full flex items-center justify-center">No user ID found
+        </div>;
+    }
     const userWarehouses = useQuery(api.warehouses.getWarehousesByUser, { userId: currentUserId }) as Warehouse[] | undefined;
     const allWarehouses = useQuery(api.warehouses.getWarehouses) as Warehouse[] | undefined;
     const transactions = useQuery(api.transactions.getTransactionsWithLocations) as TransactionWithWarehouseInfo[] | undefined;
