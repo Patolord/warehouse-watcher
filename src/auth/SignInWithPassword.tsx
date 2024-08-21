@@ -46,7 +46,7 @@ export function SignInWithPassword({
             }}
         >
             <label htmlFor="email">Email</label>
-            <Input name="email" id="email" className="mb-4" autoComplete="email" />
+            <Input name="email" id="email" className="my-4" autoComplete="email" />
             <div className="flex items-center justify-between">
                 <label htmlFor="password">Password</label>
                 {handlePasswordReset && flow === "signIn" ? (
@@ -64,7 +64,7 @@ export function SignInWithPassword({
                 type="password"
                 name="password"
                 id="password"
-                className="mb-4 "
+                className="my-4 "
                 autoComplete={flow === "signIn" ? "current-password" : "new-password"}
             />
             <input name="flow" value={flow} type="hidden" />
