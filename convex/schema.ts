@@ -57,6 +57,20 @@ const schema = defineSchema({
   })
     .index("by_material_and_version", ["materialId", "versionNumber"])
     .index("by_material", ["materialId"]),
+  embeddings: defineTable({
+    sourceId: v.union(
+      v.id("materials"),
+      v.id("warehouses"),
+      v.id("transactions")
+    ),
+    sourceType: v.union(
+      v.literal("material"),
+      v.literal("warehouse"),
+      v.literal("transaction")
+    ),
+    embedding: v.array(v.float64()),
+    textContent: v.string(),
+  }).index("by_source", ["sourceType", "sourceId"]),
 });
 
 export default schema;

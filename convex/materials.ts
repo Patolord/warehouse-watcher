@@ -4,6 +4,7 @@ import { mutation, query } from "./_generated/server";
 
 import { queryTransactionsContainingMaterial } from "./transactions";
 import { auth } from "./auth";
+import { internal } from "./_generated/api";
 
 //queries
 export const getMaterialsByUser = query({
@@ -149,6 +150,13 @@ export const createMaterial = mutation({
 
     // Update the material with the current version ID
     await ctx.db.patch(materialId, { currentVersionId: versionId });
+
+    const materialText = `${name} ${type || ""}. ${JSON.stringify(additionalAttributes) || ""}`;
+    await ctx.scheduler.runAfter(0, internal.embeddings.createEmbedding, {
+      sourceId: materialId,
+      sourceType: "material",
+      text: materialText,
+    });
 
     return { materialId, versionId };
   },

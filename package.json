@@ -52,6 +52,7 @@
     "next-themes": "^0.3.0",
     "nextjs-toploader": "^1.6.12",
     "npm": "^10.8.2",
+    "openai": "^4.56.0",
     "oslo": "^1.2.1",
     "react": "^18",
     "react-dom": "^18",

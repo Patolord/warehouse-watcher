@@ -17,6 +17,7 @@ import type {
 import type * as PasswordResetEmail from "../PasswordResetEmail.js";
 import type * as ResendOTPPasswordReset from "../ResendOTPPasswordReset.js";
 import type * as auth from "../auth.js";
+import type * as embeddings from "../embeddings.js";
 import type * as http from "../http.js";
 import type * as inventories from "../inventories.js";
 import type * as material_audit_logs from "../material_audit_logs.js";
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   PasswordResetEmail: typeof PasswordResetEmail;
   ResendOTPPasswordReset: typeof ResendOTPPasswordReset;
   auth: typeof auth;
+  embeddings: typeof embeddings;
   http: typeof http;
   inventories: typeof inventories;
   material_audit_logs: typeof material_audit_logs;
