@@ -1,5 +1,12 @@
+import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
-import { query, mutation, MutationCtx } from "./_generated/server";
+import {
+  query,
+  mutation,
+  MutationCtx,
+  DatabaseReader,
+  ActionCtx,
+} from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 
 export const updateInventory = mutation({
@@ -98,9 +105,68 @@ export const updateInventory = mutation({
       }
     }
 
+    // Create the transaction embedding
+    await createTransactionEmbedding(
+      ctx,
+      transactionId,
+      actionType,
+      fromWarehouse,
+      toWarehouse,
+      args.description
+    );
+
     return transactionId;
   },
 });
+
+async function createTransactionEmbedding(
+  ctx: MutationCtx,
+  transactionId: Id<"transactions">,
+  actionType: string,
+  fromWarehouse: Id<"warehouses"> | undefined,
+  toWarehouse: Id<"warehouses"> | undefined,
+  description: string | undefined
+) {
+  let fromWarehouseName = "N/A";
+  let toWarehouseName = "N/A";
+
+  if (fromWarehouse) {
+    const fromWarehouseDoc = await ctx.db.get(fromWarehouse);
+    fromWarehouseName = fromWarehouseDoc?.name || "Unknown";
+  }
+
+  if (toWarehouse) {
+    const toWarehouseDoc = await ctx.db.get(toWarehouse);
+    toWarehouseName = toWarehouseDoc?.name || "Unknown";
+  }
+
+  // Fetch transaction details
+  const transactionDetails = await ctx.db
+    .query("transactions_details")
+    .filter((q) => q.eq(q.field("transaction"), transactionId))
+    .collect();
+
+  // Fetch material names
+  const materialNames = await Promise.all(
+    transactionDetails.map(async (detail) => {
+      const material = await ctx.db.get(detail.materialId);
+      return `${material?.name || "Unknown"} (${detail.quantity})`;
+    })
+  );
+
+  const transactionText = `
+    ${actionType} - ${description || ""}
+    From: ${fromWarehouseName}
+    To: ${toWarehouseName}
+    Materials: ${materialNames.join(", ")}
+  `;
+
+  await ctx.scheduler.runAfter(0, internal.embeddings.createEmbedding, {
+    sourceId: transactionId,
+    sourceType: "transaction",
+    text: transactionText,
+  });
+}
 
 async function updateWarehouseInventory(
   ctx: MutationCtx,

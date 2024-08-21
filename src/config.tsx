@@ -41,8 +41,9 @@ export const NavItems = () => {
     {
       name: "Chat",
       href: "/dashboard/chat",
-      icon: <Sparkles size={20} />,
+      icon: <Sparkles size={20} color="#800080" />,
       active: isNavItemActive(pathname, "chat"),
       position: "top",
     },];
 };
+

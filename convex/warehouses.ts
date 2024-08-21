@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { auth } from "./auth";
 import { mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 
 export const createWarehouse = mutation({
   args: {
@@ -16,12 +17,19 @@ export const createWarehouse = mutation({
       throw new ConvexError("Not authenticated");
     }
 
-    const sucess = await ctx.db.insert("warehouses", {
+    const warehouseId = await ctx.db.insert("warehouses", {
       userId: userId,
       name: args.name,
       address: args.address,
       latitude: args.latitude,
       longitude: args.longitude,
+    });
+
+    const warehouseText = `${args.name}. Located at: ${args.address || ""}. Coordinates: ${args.latitude}, ${args.longitude}`;
+    await ctx.scheduler.runAfter(0, internal.embeddings.createEmbedding, {
+      sourceId: warehouseId,
+      sourceType: "warehouse",
+      text: warehouseText,
     });
   },
 });
