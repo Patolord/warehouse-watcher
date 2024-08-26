@@ -1,5 +1,6 @@
-import React from "react";
+
+import DashboardDemo from "./_components/DashboardComponents";
 
 export default function Dashboard() {
-  return <div >Dashboard</div>;
+  return <div><DashboardDemo /></div>;
 }

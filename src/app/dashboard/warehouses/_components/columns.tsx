@@ -6,6 +6,9 @@ import { ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { DeleteWarehouse } from "./delete-button";
+import { Separator } from "@/components/ui/separator";
+
 
 export const columns: ColumnDef<Doc<"warehouses">>[] = [
   {
@@ -42,18 +45,25 @@ export const columns: ColumnDef<Doc<"warehouses">>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
+    header: () => <div className="text-right">Ações</div>,
+    cell: ({ row, table }) => {
       const warehouse = row.original;
 
+
       return (
-        <Link
-          href={`/dashboard/warehouses/${warehouse._id}`}
-          className="h-7 w-7 flex items-center justify-center"
-        >
-          <Button size="sm" variant="secondary">
-            Ver Estoque
-          </Button>
-        </Link>
+        <div className="flex justify-end space-x-2">
+          <Link href={`/dashboard/warehouses/${warehouse._id}`}>
+            <Button size="sm" variant="secondary">
+              Ver Estoque
+            </Button>
+          </Link>
+
+          <DeleteWarehouse
+            warehouseId={warehouse._id}
+            warehouseName={warehouse.name}
+
+          />
+        </div>
       );
     },
   },

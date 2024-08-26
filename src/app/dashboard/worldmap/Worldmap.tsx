@@ -16,6 +16,7 @@ import {
     addLayerControl,
     addLegendControl
 } from './mapControls';
+import { fitMapToMarkers } from './mapFitting';
 
 interface WorldMapProps {
     userWarehouses: Warehouse[];
@@ -32,6 +33,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ userWarehouses, otherWarehouses, tr
     const fitToMarkersControlRef = useRef<L.Control | null>(null);
     const layerControlRef = useRef<L.Control.Layers | null>(null);
     const [mapLoaded, setMapLoaded] = useState(false);
+    const initialFitDoneRef = useRef(false);
 
     useEffect(() => {
         if (typeof window === 'undefined' || mapLoaded) return;
@@ -110,17 +112,10 @@ const WorldMap: React.FC<WorldMapProps> = ({ userWarehouses, otherWarehouses, tr
             transactionLayerRef.current
         );
 
-        // Fit map to markers
-        const allWarehouses = [...userWarehouses, ...otherWarehouses];
-        const validLocations = allWarehouses.filter(
-            (l): l is Warehouse & { latitude: number; longitude: number } =>
-                typeof l.latitude === "number" && typeof l.longitude === "number"
-        );
-        if (validLocations.length > 0) {
-            const bounds = L.latLngBounds(
-                validLocations.map((l) => [l.latitude, l.longitude])
-            );
-            map.fitBounds(bounds);
+        // Fit map to markers only on initial load
+        if (!initialFitDoneRef.current) {
+            fitMapToMarkers(map, [...userWarehouses, ...otherWarehouses]);
+            initialFitDoneRef.current = true;
         }
 
     }, [userWarehouses, otherWarehouses, transactions, mapLoaded]);

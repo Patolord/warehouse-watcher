@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import { Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
+import { auth } from "./auth";
 import { TransactionWithWarehouseInfo } from "./types";
 
 export const queryTransactionById = query({
@@ -122,12 +123,15 @@ type EnrichedTransaction = {
 export const getTransactionsForDisplayByWarehouseId = query({
   args: { warehouseId: v.id("warehouses") },
   handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+
     const transactions = await ctx.db
       .query("transactions")
       .filter((q) =>
         q.or(
           q.eq(q.field("from_location"), args.warehouseId),
-          q.eq(q.field("to_location"), args.warehouseId)
+          q.eq(q.field("to_location"), args.warehouseId),
+          q.eq(q.field("userId"), userId)
         )
       )
       .collect();

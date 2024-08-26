@@ -59,6 +59,7 @@
     "react-hook-form": "^7.52.2",
     "react-leaflet": "^4.2.1",
     "react-window": "^1.8.10",
+    "recharts": "^2.12.7",
     "resend": "^4.0.0",
     "sharp": "^0.33.4",
     "sonner": "^1.5.0",

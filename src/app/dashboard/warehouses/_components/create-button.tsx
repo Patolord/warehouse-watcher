@@ -1,13 +1,12 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { api } from "../../../../../convex/_generated/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
-import { Loader2 } from "lucide-react";
+import { Loader2, MapPin, AlertTriangle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import dynamic from 'next/dynamic';
-import debounce from 'lodash/debounce';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const MapSelector = dynamic(() => import('./MapSelector'), {
   ssr: false,
@@ -49,6 +49,7 @@ type FormValues = z.infer<typeof formSchema>;
 export function CreateButton() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const [addressNotFound, setAddressNotFound] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -79,40 +80,35 @@ export function CreateButton() {
     form.setValue('latitude', lat);
     form.setValue('longitude', lng);
     form.setValue('address', address);
+    setAddressNotFound(false);
   };
 
-  const geocodeAddress = async (address: string) => {
+  const geocodeAddress = async () => {
+    const address = form.getValues('address');
+    if (!address) {
+      toast.error("Por favor, insira um endereço antes de atualizar o mapa.");
+      return;
+    }
+
     setIsGeocoding(true);
+    setAddressNotFound(false);
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
       const data = await response.json();
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
         handleLocationChange(parseFloat(lat), parseFloat(lon), address);
+        toast.success("Mapa atualizado com sucesso.");
       } else {
+        setAddressNotFound(true);
         toast.error("Endereço não encontrado. Por favor, ajuste manualmente no mapa.");
       }
     } catch (error) {
       console.error("Erro ao geocodificar o endereço:", error);
+      setAddressNotFound(true);
       toast.error("Erro ao buscar o endereço. Por favor, ajuste manualmente no mapa.");
     } finally {
       setIsGeocoding(false);
-    }
-  };
-
-  // Debounced version of geocodeAddress
-  const debouncedGeocodeAddress = useCallback(
-    debounce((address: string) => {
-      geocodeAddress(address);
-    }, 1000), // 1000ms delay
-    []
-  );
-
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newAddress = e.target.value;
-    form.setValue('address', newAddress);
-    if (newAddress.length > 3) { // Only geocode if address is longer than 3 characters
-      debouncedGeocodeAddress(newAddress);
     }
   };
 
@@ -125,7 +121,7 @@ export function CreateButton() {
         <DialogHeader>
           <DialogTitle>Adicionar Estoque</DialogTitle>
           <DialogDescription>
-            Digite o nome e endereço do estoque, e ajuste a localização no mapa se necessário.
+            Digite o nome e endereço do estoque, e clique em "Atualizar Mapa" para ajustar a localização.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -155,14 +151,31 @@ export function CreateButton() {
                       <Input
                         placeholder="Endereço completo"
                         {...field}
-                        onChange={handleAddressChange}
-                        disabled={isGeocoding}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <Button
+                type="button"
+                onClick={geocodeAddress}
+                disabled={isGeocoding}
+                className="flex gap-1"
+              >
+                {isGeocoding && <Loader2 className="h-4 w-4 animate-spin" />}
+                Atualizar Mapa
+              </Button>
+
+              {addressNotFound && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    Endereço não encontrado. Por favor, ajuste manualmente no mapa.
+                  </AlertDescription>
+                </Alert>
+              )}
 
               <FormItem>
                 <FormLabel>Localização</FormLabel>
@@ -175,14 +188,21 @@ export function CreateButton() {
                 </FormControl>
                 <FormMessage />
               </FormItem>
+
+              <div className="flex items-center space-x-2 text-yellow-600">
+                <MapPin className="h-4 w-4" />
+                <p className="text-sm">
+                  Ajuste a localização no mapa se necessário para maior precisão.
+                </p>
+              </div>
             </div>
             <DialogFooter>
               <Button
                 type="submit"
-                disabled={form.formState.isSubmitting || isGeocoding}
+                disabled={form.formState.isSubmitting}
                 className="flex gap-1"
               >
-                {(form.formState.isSubmitting || isGeocoding) && (
+                {form.formState.isSubmitting && (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 )}
                 Salvar
