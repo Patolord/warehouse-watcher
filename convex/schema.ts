@@ -13,7 +13,7 @@ const schema = defineSchema({
     currentVersionId: v.optional(v.id("materialVersions")),
   })
     .index("by_name", ["name"])
-    .index("by_type", ["type"]),
+    .index("by_user_and_type", ["userId", "type"]),
   warehouses: defineTable({
     userId: v.string(),
     name: v.string(),

@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import Header from "./header";
 import NextTopLoader from 'nextjs-toploader';
+import TailwindIndicator from "@/components/tailwind-indicator";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,6 +37,7 @@ export default async function RootLayout({
             >
               <Header />
               {children}
+              <TailwindIndicator />
             </ThemeProvider>
           </ConvexClientProvider>
         </body>

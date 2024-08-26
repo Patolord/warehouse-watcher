@@ -76,7 +76,7 @@ export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses
       await fetch("https://projectplannerai.com/api/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: "User added a material to a warehouse", projectId: "j5742cwe4q0jd7ga6qwbb827r56sm1n7" }),
+        body: JSON.stringify({ key: "User added a material to a warehouse", projectId: process.env.NEXT_PUBLIC_PROJECT_PLANNER_ID }),
       });
 
       setMaterialsList([]);

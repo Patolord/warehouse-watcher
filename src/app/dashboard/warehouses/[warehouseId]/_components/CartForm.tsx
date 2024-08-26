@@ -39,7 +39,7 @@ export default function CartForm({
     }))
   );
 
-  const warehouses = useQuery(api.warehouses.getWarehouses);
+  const warehouses = useQuery(api.warehouses.getWarehousesByUser);
 
   const warehousesMinusCurrent = warehouses?.filter(
     (warehouse) => warehouse._id !== warehouseId
@@ -116,7 +116,7 @@ export default function CartForm({
       await fetch("https://projectplannerai.com/api/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: "User realized a transaction", projectId: "j5742cwe4q0jd7ga6qwbb827r56sm1n7" }),
+        body: JSON.stringify({ key: "User realized a transaction", projectId: process.env.NEXT_PUBLIC_PROJECT_PLANNER_ID }),
       });
 
       toast.success(values.consumeHere ? "Materiais consumidos com sucesso!" : "Transferência realizada com sucesso!");

@@ -5,6 +5,7 @@ import { mutation, query } from "./_generated/server";
 import { queryTransactionsContainingMaterial } from "./transactions";
 import { auth } from "./auth";
 import { internal } from "./_generated/api";
+import { getUserId } from "./embeddings";
 
 //queries
 export const getMaterialsByUser = query({
@@ -70,11 +71,17 @@ export const getMaterialsWithImageByUser = query({
   },
 });
 
-export const getUniqueMaterialTypes = query({
+export const getUniqueMaterialTypesByUser = query({
   handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+
+    if (!userId) {
+      throw new ConvexError("User not authenticated");
+    }
+
     const materials = await ctx.db
       .query("materials")
-      .withIndex("by_type")
+      .withIndex("by_user_and_type", (q) => q.eq("userId", userId))
       .collect();
 
     const uniqueTypes = new Set(materials.map((material) => material.type));

@@ -1,3 +1,4 @@
+import FeedbackButton from "@/components/feedback";
 import SideNav from "./side-nav";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -12,6 +13,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </div>
+      </div>
+      <div className="fixed bottom-4 right-4">
+        <FeedbackButton />
       </div>
     </div>
   );

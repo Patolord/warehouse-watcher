@@ -41,7 +41,7 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
-  const types2 = useQuery(api.materials.getUniqueMaterialTypes);
+  const types2 = useQuery(api.materials.getUniqueMaterialTypesByUser);
 
   const isLoading = !types2;
 

@@ -65,7 +65,7 @@ export function CreateButton({ variantText }: CreateButtonProps) {
   });
 
   const createMaterial = useMutation(api.materials.createMaterial);
-  const materialTypes = useQuery(api.materials.getUniqueMaterialTypes);
+  const materialTypes = useQuery(api.materials.getUniqueMaterialTypesByUser);
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
