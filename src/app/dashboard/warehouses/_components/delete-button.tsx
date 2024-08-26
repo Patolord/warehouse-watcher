@@ -66,7 +66,7 @@ export function DeleteWarehouse({ warehouseId, warehouseName }: DeleteWarehouseP
                     <AlertDialogHeader>
                         <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Tem certeza que deseja excluir o armazém "{warehouseName}"? Esta ação não pode ser desfeita.
+                            Tem certeza que deseja excluir o armazém &quot;{warehouseName}&quot;? Esta ação não pode ser desfeita.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

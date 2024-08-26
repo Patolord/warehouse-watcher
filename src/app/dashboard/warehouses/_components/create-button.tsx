@@ -121,7 +121,7 @@ export function CreateButton() {
         <DialogHeader>
           <DialogTitle>Adicionar Estoque</DialogTitle>
           <DialogDescription>
-            Digite o nome e endereço do estoque, e clique em "Atualizar Mapa" para ajustar a localização.
+            Digite o nome e endereço do estoque, e clique em &quot;Atualizar Mapa&quot; para ajustar a localização.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
