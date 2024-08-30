@@ -42,7 +42,7 @@ export function titleCase(string: string): string {
     .map((word) =>
       word.length === 1 || lowercaseWords.includes(word)
         ? word
-        : word.charAt(0).toUpperCase() + word.slice(1),
+        : word.charAt(0).toUpperCase() + word.slice(1)
     )
     .join(" ")
     .trim();

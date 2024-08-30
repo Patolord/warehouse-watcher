@@ -7,8 +7,11 @@ import { Menu } from "lucide-react";
 import WarehouseWatcherLogo from "@/components/logo";
 import { SignInDialog } from "@/auth/SignInDialog";
 import { SignOutButton } from "@/auth/SignOut";
-import { api } from "../../convex/_generated/api";
+import { LanguageSwitcher } from "./language-switcher";
+
 import { NavItems } from "@/config";
+import { api } from "../../convex/_generated/api";
+import { SignInButton } from "@/auth/SignInButton";
 
 export default function Header() {
   const viewer = useQuery(api.users.viewer, {});
@@ -29,12 +32,15 @@ export default function Header() {
         <WarehouseWatcherLogo />
       </Link>
       <div className="ml-4 flex items-center gap-3">
+
         <AuthLoading>Carregando...</AuthLoading>
         <Unauthenticated>
-          <SignInDialog />
+          <LanguageSwitcher />
+          <SignInButton />
         </Unauthenticated>
         <Authenticated>
           {viewer && <span className="hidden md:inline">{viewer.email}</span>}
+          <LanguageSwitcher />
           <SignOutButton />
           <button onClick={toggleNav} className="md:hidden">
             <Menu size={24} />

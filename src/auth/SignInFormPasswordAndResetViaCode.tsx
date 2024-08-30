@@ -1,7 +1,8 @@
+import React, { useState } from 'react';
 import { ResetPasswordWithEmailCode } from "@/auth/ResetPasswordWithEmailCode";
 import { SignInWithPassword } from "@/auth/SignInWithPassword";
 import { Toaster } from "@/components/ui/toaster";
-import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 /**
  * Users choose between OAuth providers or email and password combo.
@@ -10,6 +11,17 @@ import { useState } from "react";
  */
 export function SignInFormPasswordAndResetViaCode() {
     const [step, setStep] = useState<"signIn" | "forgot">("signIn");
+    const { toast } = useToast();
+    const provider = "password-with-reset";
+
+    const handleSignInSuccess = (email: string) => {
+        toast({
+            title: "Sign in successful",
+            description: `Signed in as ${email}`,
+        });
+        // Additional logic after successful sign in
+    };
+
     return (
         <div className="max-w-[384px] mx-auto flex flex-col gap-4">
             {step === "signIn" ? (
@@ -18,14 +30,14 @@ export function SignInFormPasswordAndResetViaCode() {
                         Sign in or create an account
                     </h2>
                     <SignInWithPassword
-                        provider="password-with-reset"
-                        handlePasswordReset={() => setStep("forgot")}
+                        onPasswordReset={() => setStep("forgot")}
+                        onSuccess={handleSignInSuccess}
                     />
                 </>
             ) : (
                 <ResetPasswordWithEmailCode
-                    provider="password-with-reset"
                     handleCancel={() => setStep("signIn")}
+                    provider={provider}
                 />
             )}
             <Toaster />

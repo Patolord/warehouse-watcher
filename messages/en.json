@@ -1,5 +1,78 @@
 {
-    "HomePage": {
-      "title": "Hello world!"
+  "HomePage": {
+    "title": "Warehouse Watcher: Your Inventory, Real-Time",
+    "description": "Warehouse Watcher is a powerful, user-friendly inventory system that brings real-time updates to your fingertips. Designed for both businesses and customers, it's the standalone solution that revolutionizes warehouse management.",
+    "heroImageAlt": "Hero Illustration",
+    "featuresIntro": "Empowering your inventory management with",
+    "featuresHighlight": "cutting-edge features",
+    "features": {
+      "realtime": "Realtime Updates",
+      "reports": "Advanced Reports",
+      "auditable": "Auditable Data",
+      "standalone": "Standalone Solution",
+      "ui": "Clean, Polished UI"
     }
+  },
+  "Benefits": {
+    "imageAlt": "Benefits Illustration",
+    "benefitOne": {
+      "title": "Real-Time Inventory Management",
+      "desc": "Warehouse Watcher provides instant visibility into your inventory, helping you make informed decisions faster and more accurately than ever before.",
+      "bullets": {
+        "liveStockUpdates": {
+          "title": "Live Stock Updates",
+          "desc": "See stock levels change in real-time as items move in and out of your warehouse."
+        },
+        "advancedAnalytics": {
+          "title": "Advanced Analytics",
+          "desc": "Gain insights into inventory trends, predict future needs, and optimize your stock levels."
+        },
+        "streamlinedOperations": {
+          "title": "Streamlined Operations",
+          "desc": "Automate routine tasks and reduce manual errors, boosting overall efficiency."
+        }
+      }
+    },
+    "benefitTwo": {
+      "title": "User-Centric Design",
+      "desc": "Warehouse Watcher is built with both businesses and customers in mind, offering an intuitive interface that makes inventory management a breeze.",
+      "bullets": {
+        "mobileFirst": {
+          "title": "Mobile-First Approach",
+          "desc": "Access your inventory data anytime, anywhere with our responsive mobile design."
+        },
+        "standalone": {
+          "title": "Standalone Solution",
+          "desc": "No complex integrations required. Warehouse Watcher works right out of the box."
+        },
+        "secure": {
+          "title": "Secure and Reliable",
+          "desc": "Built on Convex DB for unparalleled data security and system reliability."
+        }
+      }
+    }
+  },
+  "HeroAuth": {
+    "goToDashboard": "Go to Dashboard",
+    "viewOnGithub": "View on Github"
+  },
+  "Auth": {
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signInTitle": "Sign in to your account",
+    "signInError": "Could not sign in, did you mean to sign up?",
+    "signUpError": "Could not sign up, did you mean to sign in?",
+    "forgotPassword": "Forgot your password?",
+    "createAccount": "New user? Create an account!",
+    "alreadyHaveAccount": "Already have an account? Sign in",
+    "passwordResetRequested": "Password reset request sent",
+    "passwordResetError": "Error requesting password reset",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password must be at least 8 characters long",
+    "authenticationFailed": "Authentication failed",
+    "authenticating": "Authenticating...",
+    "signInWithGithub": "Sign in with GitHub"
   }
+}
