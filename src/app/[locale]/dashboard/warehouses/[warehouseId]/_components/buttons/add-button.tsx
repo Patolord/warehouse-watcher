@@ -68,7 +68,7 @@ export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses
 
       await createTransaction({
         toWarehouse: orderData.toWarehouse,
-        actionType: "add",
+        actionType: "added",
         materials: orderData.materials,
         description: orderData.description,
       });

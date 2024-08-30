@@ -15,9 +15,9 @@ export const updateInventory = mutation({
     fromWarehouse: v.optional(v.id("warehouses")),
     toWarehouse: v.optional(v.id("warehouses")),
     actionType: v.union(
-      v.literal("transfer"),
-      v.literal("add"),
-      v.literal("remove")
+      v.literal("transfered"),
+      v.literal("added"),
+      v.literal("removed")
     ),
     materials: v.array(
       v.object({
@@ -77,7 +77,7 @@ export const updateInventory = mutation({
       });
 
       // Update inventory based on action type
-      if (actionType === "transfer") {
+      if (actionType === "transfered") {
         if (!fromWarehouse || !toWarehouse) {
           throw new ConvexError(
             "Both fromWarehouse and toWarehouse are required for transfers"
@@ -90,12 +90,12 @@ export const updateInventory = mutation({
           -quantity
         );
         await updateWarehouseInventory(ctx, toWarehouse, materialId, quantity);
-      } else if (actionType === "add") {
+      } else if (actionType === "added") {
         if (!toWarehouse) {
           throw new ConvexError("toWarehouse is required for additions");
         }
         await updateWarehouseInventory(ctx, toWarehouse, materialId, quantity);
-      } else if (actionType === "remove") {
+      } else if (actionType === "removed") {
         if (!fromWarehouse) {
           throw new ConvexError("fromWarehouse is required for removals");
         }

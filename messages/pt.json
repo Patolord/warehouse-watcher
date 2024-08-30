@@ -74,5 +74,25 @@
     "authenticationFailed": "Falha na autenticação",
     "authenticating": "Autenticando...",
     "signInWithGithub": "Entrar com GitHub"
+  },
+  "MaterialIDPage": {
+    "materialDetails": "Detalhes do Material",
+    "id": "ID",
+    "transactionsTitle": "Transações",
+    "transactionsFound": "transações encontradas para este material",
+    "actionType": {
+     
+      "added": "Adicionado",
+      "removed": "Removido",
+      "transfer": "Transferência"
+    },
+    "noActionType": "Sem Tipo de Ação",
+    "from": "De",
+    "to": "Para",
+    "noTransactionsFound": "Nenhuma transação encontrada.",
+    "namesTitle": "Nomes",
+    "versionsFound": "versões encontradas para este material",
+    "noName": "Sem Nome",
+    "noVersionsFound": "Nenhuma versão encontrada."
   }
 }

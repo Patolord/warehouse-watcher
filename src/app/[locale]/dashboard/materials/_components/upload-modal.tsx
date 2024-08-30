@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "../../../../../../convex/_generated/api";
-import { Doc } from "../../../../../../convex/_generated/dataModel";
+import { Doc, Id } from "../../../../../../convex/_generated/dataModel";
 import { zodResolver } from "@hookform/resolvers/zod";
 import imageCompression from "browser-image-compression";
 import { useMutation } from "convex/react";
@@ -32,7 +32,7 @@ const formSchema = z.object({
     ),
 });
 
-export function UploadModal({ material }: { material: Doc<"materials"> }) {
+export function UploadModal({ materialId }: { materialId: Id<"materials"> }) {
   const generateUploadUrl = useMutation(api.materials.generateUploadUrl);
   const uploadFile = useMutation(api.materials.addImageToMaterial);
 
@@ -69,7 +69,7 @@ export function UploadModal({ material }: { material: Doc<"materials"> }) {
 
       await uploadFile({
         imageFileId: storageId,
-        materialId: material._id,
+        materialId: materialId,
       });
       form.reset();
 

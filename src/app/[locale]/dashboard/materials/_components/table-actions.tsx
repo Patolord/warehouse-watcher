@@ -37,7 +37,7 @@ export default function Actions({ material }: { material: Doc<"materials"> }) {
         <Button size="xs" variant="ghost" onClick={() => setIsEditOpen(true)}>
           <Pencil size={18} />
         </Button>
-        <UploadModal material={material} />
+        <UploadModal materialId={material._id} />
 
         <Button size="xs" variant="ghost">
           <Link href={`/dashboard/materials/${material._id}`}><Info /></Link>

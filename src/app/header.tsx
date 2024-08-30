@@ -23,7 +23,7 @@ export default function Header() {
   };
 
   return (
-    <header className="flex items-center h-[70px] px-4 border-b shrink-0 md:px-6 justify-between bg-slate-100 dark:bg-slate-900">
+    <header className="flex items-center h-[70px] px-4 border-b shrink-0 md:px-10 justify-between bg-slate-100 dark:bg-slate-900">
       <Link
         href="/"
         className="flex items-center gap-2 text-lg font-semibold md:text-base"
@@ -40,7 +40,7 @@ export default function Header() {
         </Unauthenticated>
         <Authenticated>
           {viewer && <span className="hidden md:inline">{viewer.email}</span>}
-          <LanguageSwitcher />
+
           <SignOutButton />
           <button onClick={toggleNav} className="md:hidden">
             <Menu size={24} />

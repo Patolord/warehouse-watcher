@@ -108,7 +108,7 @@ export default function CartForm({
       await updateInventory({
         fromWarehouse: warehouseId,
         toWarehouse: values.consumeHere ? undefined : values.toWarehouseId as Id<"warehouses">,
-        actionType: values.consumeHere ? "remove" : "transfer",
+        actionType: values.consumeHere ? "removed" : "transfered",
         materials: materials,
         description: values.description,
       });
