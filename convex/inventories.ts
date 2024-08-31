@@ -8,7 +8,7 @@ import {
   ActionCtx,
 } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
-import { getUserId } from "./embeddings";
+import { auth } from "./auth"; // Import auth instead of getUserId
 
 export const updateInventory = mutation({
   args: {
@@ -31,7 +31,12 @@ export const updateInventory = mutation({
   handler: async (ctx, args) => {
     const { fromWarehouse, toWarehouse, actionType, materials } = args;
 
-    const userId = await getUserId(ctx);
+    const fullUserId = await auth.getUserId(ctx);
+    if (!fullUserId) {
+      throw new ConvexError("User not authenticated");
+    }
+    // Extract the part before the '|' character
+    const userId = fullUserId.split('|')[0];
 
     // Create the transaction
     const transactionId = await ctx.db.insert("transactions", {

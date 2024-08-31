@@ -205,7 +205,25 @@ export const getAllTransactions = query({
 export const getTransactionsWithLocations = query({
   args: {},
   handler: async (ctx): Promise<TransactionWithWarehouseInfo[]> => {
-    const transactions = await ctx.db.query("transactions").collect();
+    const userId = await auth.getUserId(ctx);
+    console.log("Current user ID:", userId);
+
+    if (!userId) {
+      console.log("User not authenticated");
+      throw new Error("User not authenticated");
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("userId").slice(0, userId.length), userId))
+      .collect();
+
+    console.log("Number of transactions found:", transactions.length);
+
+    if (transactions.length === 0) {
+      console.log("No transactions found for user:", userId);
+    }
+
     const transactionsWithLocations = await Promise.all(
       transactions.map(
         async (transaction): Promise<TransactionWithWarehouseInfo> => {
@@ -223,6 +241,56 @@ export const getTransactionsWithLocations = query({
         }
       )
     );
+
+    console.log("Transactions with locations:", transactionsWithLocations);
+
     return transactionsWithLocations;
+  },
+});
+
+export const getUserTransactionsWithLocations = query({
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) {
+      console.log("No user ID found");
+      return [];
+    }
+
+    console.log("Fetching transactions for user:", userId);
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("userId"), userId))
+      .collect();
+
+    console.log("Number of transactions found:", transactions.length);
+
+    const transactionsWithLocations = await Promise.all(
+      transactions.map(async (transaction) => {
+        const fromWarehouse = transaction.from_location
+          ? await ctx.db.get(transaction.from_location)
+          : null;
+        const toWarehouse = transaction.to_location
+          ? await ctx.db.get(transaction.to_location)
+          : null;
+        return {
+          ...transaction,
+          from_warehouse: fromWarehouse,
+          to_warehouse: toWarehouse,
+        };
+      })
+    );
+
+    console.log("Transactions with locations:", transactionsWithLocations);
+
+    return transactionsWithLocations;
+  },
+});
+
+export const debugAllTransactions = query({
+  handler: async (ctx) => {
+    const allTransactions = await ctx.db.query("transactions").collect();
+    console.log("All transactions:", allTransactions);
+    return allTransactions;
   },
 });

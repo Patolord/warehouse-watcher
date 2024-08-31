@@ -1,8 +1,8 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Menu } from "lucide-react";
 import Link from "next/link";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Tooltip,
@@ -16,18 +16,15 @@ import { cn } from "@/lib/utils";
 export default function SideNav() {
   const navItems = NavItems();
 
-  // Start with a default value that is the same for both server and client
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
 
   useEffect(() => {
-    // Only read from localStorage after the component has mounted
     const saved = window.localStorage.getItem("sidebarExpanded");
     if (saved !== null) {
       setIsSidebarExpanded(JSON.parse(saved));
     }
   }, []);
 
-  // Save the sidebar state in localStorage when it changes
   useEffect(() => {
     window.localStorage.setItem(
       "sidebarExpanded",
@@ -35,76 +32,60 @@ export default function SideNav() {
     );
   }, [isSidebarExpanded]);
 
-  // Toggle the sidebar state
   const toggleSidebar = () => {
     setIsSidebarExpanded(!isSidebarExpanded);
   };
 
   return (
-    <div className="pr-4">
+    <div className="h-full">
       <div
         className={cn(
           isSidebarExpanded ? "w-[200px]" : "w-[68px]",
-          "border-r transition-all duration-300 ease-in-out transform hidden sm:flex h-full bg-accent"
+          "border-r transition-all duration-300 ease-in-out transform hidden sm:flex h-full bg-background"
         )}
       >
-        <aside className="flex flex-col w-full break-words px-4   overflow-x-hidden h-full columns-1">
-          {/* Top */}
-          <div className="mt-4 relative pb-2 ">
-            <div className="flex flex-col space-y-1">
-              {navItems.map((item, idx) => {
-                if (item.position === "top") {
-                  return (
-                    <Fragment key={idx}>
-                      <div className="space-y-1">
-                        <SideNavItem
-                          label={item.name}
-                          icon={item.icon}
-                          path={item.href}
-                          active={item.active}
-                          isSidebarExpanded={isSidebarExpanded}
-                        />
-                      </div>
-                    </Fragment>
-                  );
-                }
-              })}
-            </div>
+        <aside className="flex flex-col w-full break-words px-2 py-4 overflow-x-hidden h-full">
+          <button
+            type="button"
+            className="self-start p-2 mb-4 rounded-md hover:bg-muted"
+            onClick={toggleSidebar}
+          >
+            <Menu size={24} />
+          </button>
+
+          <div className="flex flex-col space-y-1">
+            {navItems.map((item, idx) => {
+              if (item.position === "top") {
+                return (
+                  <SideNavItem
+                    key={idx}
+                    label={item.name}
+                    icon={item.icon}
+                    path={item.href}
+                    active={item.active}
+                    isSidebarExpanded={isSidebarExpanded}
+                  />
+                );
+              }
+            })}
           </div>
-          {/* Bottom */}
-          <div className="sticky bottom-0  mt-auto whitespace-nowrap mb-4 transition duration-200 block">
+          <div className="mt-auto">
             {navItems.map((item, idx) => {
               if (item.position === "bottom") {
                 return (
-                  <Fragment key={idx}>
-                    <div className="space-y-1">
-                      <SideNavItem
-                        label={item.name}
-                        icon={item.icon}
-                        path={item.href}
-                        active={item.active}
-                        isSidebarExpanded={isSidebarExpanded}
-                      />
-                    </div>
-                  </Fragment>
+                  <SideNavItem
+                    key={idx}
+                    label={item.name}
+                    icon={item.icon}
+                    path={item.href}
+                    active={item.active}
+                    isSidebarExpanded={isSidebarExpanded}
+                  />
                 );
               }
             })}
           </div>
         </aside>
-        <div className="mt-[calc(calc(90vh)-40px)] relative">
-          <button
-            type="button"
-            className="absolute bottom-32 right-[-12px] flex h-6 w-6 items-center justify-center rounded-full bg-neutral-100 shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out"
-            onClick={toggleSidebar}
-          >
-            {isSidebarExpanded ? (
-              <ChevronLeft size={16} />
-            ) : (
-              <ChevronRight size={16} />
-            )}
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -118,46 +99,28 @@ export const SideNavItem: React.FC<{
   isSidebarExpanded: boolean;
 }> = ({ label, icon, path, active, isSidebarExpanded }) => {
   return (
-    <>
-      {isSidebarExpanded ? (
-        <Link
-          href={path}
-          className={`h-full relative flex items-center whitespace-nowrap rounded-md ${active
-            ? "font-base text-sm bg-neutral-200 shadow-sm text-neutral-700 dark:bg-neutral-800 dark:text-white"
-            : "hover:bg-neutral-200  hover:text-neutral-700 text-neutral-500 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
-            }`}
-        >
-          <div className="relative font-base text-sm py-1.5 px-2 flex flex-row items-center space-x-2 rounded-md duration-100">
+    <TooltipProvider delayDuration={70}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Link
+            href={path}
+            className={cn(
+              "flex items-center rounded-md px-2 py-1.5 text-sm font-medium",
+              active
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            )}
+          >
             {icon}
+            {isSidebarExpanded && <span className="ml-2">{label}</span>}
+          </Link>
+        </TooltipTrigger>
+        {!isSidebarExpanded && (
+          <TooltipContent side="right" className="px-2 py-1 text-xs">
             <span>{label}</span>
-          </div>
-        </Link>
-      ) : (
-        <TooltipProvider delayDuration={70}>
-          <Tooltip>
-            <TooltipTrigger>
-              <Link
-                href={path}
-                className={`h-full relative flex items-center whitespace-nowrap rounded-md ${active
-                  ? "font-base text-sm  bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-white"
-                  : "hover:bg-neutral-200 hover:text-neutral-700 text-neutral-500 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
-                  }`}
-              >
-                <div className="relative font-base text-sm p-2 flex flex-row items-center space-x-2 rounded-md duration-100">
-                  {icon}
-                </div>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent
-              side="left"
-              className="px-3 py-1.5 text-xs"
-              sideOffset={10}
-            >
-              <span>{label}</span>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-    </>
+          </TooltipContent>
+        )}
+      </Tooltip>
+    </TooltipProvider>
   );
 };

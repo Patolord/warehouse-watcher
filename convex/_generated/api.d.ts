@@ -14,17 +14,17 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as PasswordResetEmail from "../PasswordResetEmail.js";
-import type * as ResendOTPPasswordReset from "../ResendOTPPasswordReset.js";
 import type * as auth from "../auth.js";
 import type * as embeddings from "../embeddings.js";
 import type * as http from "../http.js";
 import type * as inventories from "../inventories.js";
+import type * as materials from "../materials.js";
 import type * as material_audit_logs from "../material_audit_logs.js";
 import type * as material_versions from "../material_versions.js";
-import type * as materials from "../materials.js";
 import type * as otp_ResendOTP from "../otp/ResendOTP.js";
 import type * as otp_VerificationCodeEmail from "../otp/VerificationCodeEmail.js";
+import type * as PasswordResetEmail from "../PasswordResetEmail.js";
+import type * as ResendOTPPasswordReset from "../ResendOTPPasswordReset.js";
 import type * as transactions from "../transactions.js";
 import type * as transactions_details from "../transactions_details.js";
 import type * as types from "../types.js";
@@ -40,17 +40,17 @@ import type * as warehouses from "../warehouses.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  PasswordResetEmail: typeof PasswordResetEmail;
-  ResendOTPPasswordReset: typeof ResendOTPPasswordReset;
   auth: typeof auth;
   embeddings: typeof embeddings;
   http: typeof http;
   inventories: typeof inventories;
+  materials: typeof materials;
   material_audit_logs: typeof material_audit_logs;
   material_versions: typeof material_versions;
-  materials: typeof materials;
   "otp/ResendOTP": typeof otp_ResendOTP;
   "otp/VerificationCodeEmail": typeof otp_VerificationCodeEmail;
+  PasswordResetEmail: typeof PasswordResetEmail;
+  ResendOTPPasswordReset: typeof ResendOTPPasswordReset;
   transactions: typeof transactions;
   transactions_details: typeof transactions_details;
   types: typeof types;

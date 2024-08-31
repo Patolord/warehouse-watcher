@@ -10,7 +10,10 @@ export const createMarkers = (
     .map((location) => {
       if (location.latitude && location.longitude) {
         const icon = createIcon(location);
-        return L.marker([location.latitude, location.longitude], { icon })
+        return L.marker([location.latitude, location.longitude], {
+          icon,
+          warehouse: location // Add this line
+        })
           .addTo(map)
           .bindPopup(createPopupContent(location));
       }

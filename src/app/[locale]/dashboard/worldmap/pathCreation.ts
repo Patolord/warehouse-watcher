@@ -5,8 +5,11 @@ import { animateDot } from "./animationHelpers";
 
 export const createTransactionPaths = (
   transactions: TransactionWithWarehouseInfo[],
-  map: L.Map
+  map: L.Map,
+  onTransactionsSelect: (transactions: TransactionWithWarehouseInfo[] | null) => void
 ): L.Layer[] => {
+  console.log("Creating transaction paths for", transactions.length, "transactions");
+
   const pathGroups: { [key: string]: TransactionWithWarehouseInfo[] } = {};
   const createdLayers: L.Layer[] = [];
 
@@ -26,8 +29,12 @@ export const createTransactionPaths = (
         pathGroups[key] = [];
       }
       pathGroups[key].push(transaction);
+    } else {
+      console.log("Transaction missing warehouse info:", transaction);
     }
   });
+
+  console.log("Path groups created:", Object.keys(pathGroups).length);
 
   // Create a single path for each group
   Object.values(pathGroups).forEach((group) => {
@@ -84,7 +91,7 @@ export const createTransactionPaths = (
       });
       createdLayers.push(decorator);
 
-      // Add label with transaction count
+      // Update the label to include a click event
       const midpoint = interpolatePoint(from, to, 0.5);
       const label = L.marker(midpoint, {
         icon: L.divIcon({
@@ -92,6 +99,10 @@ export const createTransactionPaths = (
           html: `<div>${group.length}</div>`,
           iconSize: [30, 30],
         }),
+      });
+      label.on('click', (e) => {
+        L.DomEvent.stopPropagation(e);
+        onTransactionsSelect(group);
       });
       createdLayers.push(label);
 

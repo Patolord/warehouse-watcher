@@ -39,6 +39,11 @@ export const injectAnimationCSS = (): void => {
       align-items: center;
       justify-content: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.1s ease-in-out;
+    }
+    .transaction-label:hover {
+      transform: scale(1.1);
     }
     .transaction-label div {
       margin-top: -2px;
