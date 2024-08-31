@@ -41,6 +41,7 @@ export function MovDataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({
       Descrição: false,
+      Romaneio: false,
     });
 
   const table = useReactTable({
@@ -79,9 +80,9 @@ export function MovDataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                     </TableHead>
                   );
                 })}

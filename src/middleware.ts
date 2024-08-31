@@ -5,6 +5,7 @@ import {
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
 import createIntlMiddleware from "next-intl/middleware";
+import { NextResponse } from "next/server";
 
 const intlMiddleware = createIntlMiddleware({
   locales: ["en", "pt"],
@@ -18,19 +19,25 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default convexAuthNextjsMiddleware(async (request) => {
-  // First, handle the authentication logic
-  if (isLandingPage(request) && isAuthenticatedNextjs()) {
+  // Lightweight auth check
+  const isAuthenticated = await isAuthenticatedNextjs();
+
+  // Handle authentication logic
+  if (isLandingPage(request) && isAuthenticated) {
     return nextjsMiddlewareRedirect(request, "/dashboard");
   }
-  if (isProtectedRoute(request) && !isAuthenticatedNextjs()) {
+  if (isProtectedRoute(request) && !isAuthenticated) {
     return nextjsMiddlewareRedirect(request, "/");
   }
 
-  // If authentication is okay, then apply the intlMiddleware
+  // Apply intlMiddleware
   const response = await intlMiddleware(request);
 
-  // Return the response from intlMiddleware or continue with the default response
-  return response || undefined;
+  // Add auth state to headers for client-side use
+  const finalResponse = response || NextResponse.next();
+  finalResponse.headers.set("x-is-authenticated", String(isAuthenticated));
+
+  return finalResponse;
 });
 
 export const config = {

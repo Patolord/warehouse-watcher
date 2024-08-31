@@ -25,12 +25,14 @@ export function SignInWithPassword({ onPasswordReset, onSuccess }: SignInWithPas
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
     const [errors, setErrors] = useState<z.ZodIssue[]>([]);
+    const [authError, setAuthError] = useState<string | null>(null);
     const t = useTranslations('Auth');
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setSubmitting(true);
         setErrors([]);
+        setAuthError(null);
 
         const formData = new FormData(event.currentTarget);
         const formValues = Object.fromEntries(formData.entries());
@@ -41,12 +43,31 @@ export function SignInWithPassword({ onPasswordReset, onSuccess }: SignInWithPas
             onSuccess(formValues.email as string);
             router.push('/dashboard');
         } catch (error) {
+            console.error(error);
             if (error instanceof z.ZodError) {
                 setErrors(error.issues);
+            } else if (error instanceof Error) {
+                // Handle various error scenarios
+                if (error.message.includes("Unexpected token") || error.message.includes("Internal Server Error")) {
+                    setAuthError(t('serverError'));
+                } else if (error.message.includes("Invalid email or password")) {
+                    setAuthError(t('invalidCredentials'));
+                } else {
+                    setAuthError(t('unknownError'));
+                }
+
+                toast({
+                    title: t('signInError'),
+                    description: authError || t('unknownError'),
+                    variant: "destructive"
+                });
             } else {
-                console.error(error);
-                const title = flow === "signIn" ? t('signInError') : t('signUpError');
-                toast({ title, variant: "destructive" });
+                setAuthError(t('unknownError'));
+                toast({
+                    title: t('signInError'),
+                    description: t('unknownError'),
+                    variant: "destructive"
+                });
             }
             setSubmitting(false);
         }
@@ -82,6 +103,10 @@ export function SignInWithPassword({ onPasswordReset, onSuccess }: SignInWithPas
             />
             {errors.find(e => e.path[0] === 'password') && (
                 <p className="text-red-500">{errors.find(e => e.path[0] === 'password')?.message}</p>
+            )}
+
+            {authError && (
+                <p className="text-red-500 mb-4">{authError}</p>
             )}
 
             <input name="flow" value={flow} type="hidden" />

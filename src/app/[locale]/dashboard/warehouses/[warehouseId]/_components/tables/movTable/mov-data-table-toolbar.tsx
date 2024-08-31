@@ -5,12 +5,6 @@ import { Table } from "@tanstack/react-table";
 
 import { DataTableFacetedFilter } from "./mov-data-table-fac-filter";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -58,7 +52,7 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div>
-        <DropdownMenu>
+        {/*  <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
               Colunas
@@ -83,11 +77,9 @@ export function DataTableToolbar<TData>({
                 );
               })}
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </div>
-      <div>
-        Revert Button
-      </div>
+
     </div>
   );
 }

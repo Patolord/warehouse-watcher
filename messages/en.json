@@ -73,7 +73,11 @@
     "passwordTooShort": "Password must be at least 8 characters long",
     "authenticationFailed": "Authentication failed",
     "authenticating": "Authenticating...",
-    "signInWithGithub": "Sign in with GitHub"
+    "signInWithGithub": "Sign in with GitHub",
+    "serverError": "An error occurred on the server. Please try again later.",
+    "serverNotResponding": "The server is not responding. Please try again later.",
+    "invalidCredentials": "Invalid email or password. Please try again.",
+    "unknownError": "An unknown error occurred"
   },
   "MaterialIDPage": {
     "materialDetails": "Material Details",
