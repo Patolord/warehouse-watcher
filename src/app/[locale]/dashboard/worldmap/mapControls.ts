@@ -3,7 +3,7 @@ import { Warehouse } from "./types";
 
 export const addFitToMarkersControl = (
   map: L.Map,
-  locations: Warehouse[]
+  userWarehouses: Warehouse[]
 ): L.Control => {
   const FitToMarkersControl = L.Control.extend({
     options: {
@@ -20,10 +20,10 @@ export const addFitToMarkersControl = (
       container.style.height = "30px";
       container.innerHTML =
         '<span style="font-size: 20px; line-height: 30px; display: block; text-align: center;">📍</span>';
-      container.title = "Fit to all markers";
+      container.title = "Fit to user warehouses";
 
       container.onclick = function () {
-        fitToMarkers(map, locations);
+        fitToMarkers(map, userWarehouses);
       };
 
       return container;
@@ -65,13 +65,13 @@ export const addScaleControl = (map: L.Map): void => {
     .addTo(map);
 };
 
-export const addLayerControl = (
+export function addLayerControl(
   map: L.Map,
   baseLayer: L.TileLayer,
   userWarehouseLayer: L.LayerGroup,
   otherWarehouseLayer: L.LayerGroup,
   transactionLayer: L.LayerGroup
-): L.Control.Layers => {
+): L.Control.Layers {
   const overlayMaps = {
     "User Warehouses": userWarehouseLayer,
     "Other Warehouses": otherWarehouseLayer,
@@ -83,25 +83,4 @@ export const addLayerControl = (
   });
   control.addTo(map);
   return control;
-};
-
-export const addLegendControl = (map: L.Map): void => {
-  const LegendControl = L.Control.extend({
-    options: {
-      position: "bottomright",
-    },
-
-    onAdd: function (map: L.Map) {
-      const container = L.DomUtil.create("div", "info legend");
-      container.innerHTML = `
-        <h4>Legend</h4>
-        <div><span style="background-color: #4CAF50; width: 10px; height: 10px; display: inline-block;"></span> User Warehouse</div>
-        <div><span style="background-color: #FF5722; width: 10px; height: 10px; display: inline-block;"></span> Other Warehouse</div>
-        <div><span style="background-color: #2196F3; width: 10px; height: 10px; display: inline-block;"></span> Transaction</div>
-      `;
-      return container;
-    },
-  });
-
-  map.addControl(new LegendControl());
 };

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "convex/react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation"; // Add this import
 import { Warehouse, TransactionWithWarehouseInfo } from "./types";
 import { api } from "../../../../../convex/_generated/api";
 import WarehouseDetails from "./WarehouseDetails";
@@ -14,6 +15,9 @@ const DynamicWorldMap = dynamic(() => import("./Worldmap"), {
 });
 
 const WarehousePage: React.FC = () => {
+  const searchParams = useSearchParams(); // Add this line
+  const warehouseId = searchParams.get("warehouseId"); // Add this line
+
   const userWarehouses = useQuery(api.warehouses.getWarehousesByUser);
   const allWarehouses = useQuery(api.warehouses.getWarehouses);
   const transactions = useQuery(api.transactions.getTransactionsWithLocations);
@@ -84,6 +88,7 @@ const WarehousePage: React.FC = () => {
             transactions={transactions as TransactionWithWarehouseInfo[]}
             onWarehouseSelect={handleWarehouseSelect}
             onTransactionsSelect={handleTransactionsSelect}
+            focusWarehouseId={warehouseId} // Add this prop
           />
         </div>
         {selectedWarehouse && (

@@ -8,8 +8,6 @@ export const createTransactionPaths = (
   map: L.Map,
   onTransactionsSelect: (transactions: TransactionWithWarehouseInfo[] | null) => void
 ): L.Layer[] => {
-  console.log("Creating transaction paths for", transactions.length, "transactions");
-
   const pathGroups: { [key: string]: TransactionWithWarehouseInfo[] } = {};
   const createdLayers: L.Layer[] = [];
 
@@ -29,12 +27,8 @@ export const createTransactionPaths = (
         pathGroups[key] = [];
       }
       pathGroups[key].push(transaction);
-    } else {
-      console.log("Transaction missing warehouse info:", transaction);
     }
   });
-
-  console.log("Path groups created:", Object.keys(pathGroups).length);
 
   // Create a single path for each group
   Object.values(pathGroups).forEach((group) => {
@@ -91,7 +85,7 @@ export const createTransactionPaths = (
       });
       createdLayers.push(decorator);
 
-      // Update the label to include a click event
+      // Update the label to include transaction count and handle click event
       const midpoint = interpolatePoint(from, to, 0.5);
       const label = L.marker(midpoint, {
         icon: L.divIcon({
@@ -106,10 +100,6 @@ export const createTransactionPaths = (
       });
       createdLayers.push(label);
 
-      // Create popup content
-      const popupContent = createPopupContent(group);
-      path.bindPopup(popupContent);
-
       // Animate dots along the path
       for (let i = 0; i < 3; i++) {
         setTimeout(
@@ -121,18 +111,4 @@ export const createTransactionPaths = (
   });
 
   return createdLayers;
-};
-
-const createPopupContent = (group: TransactionWithWarehouseInfo[]): string => {
-  const firstTransaction = group[0];
-  return `
-    <div>
-      <h3>Transactions: ${group.length}</h3>
-      <p>From: ${firstTransaction.from_warehouse!.name}</p>
-      <p>To: ${firstTransaction.to_warehouse!.name}</p>
-      <ul>
-        ${group.map((t) => `<li>${t.action_type}${t.description ? `: ${t.description}` : ""}</li>`).join("")}
-      </ul>
-    </div>
-  `;
 };

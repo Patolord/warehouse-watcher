@@ -1,0 +1,41 @@
+.custom-div-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.user-warehouse {
+  background-color: #4caf50;
+}
+
+.other-warehouse {
+  background-color: #ff5722;
+}
+
+.leaflet-control-layers {
+  border-radius: 4px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.leaflet-control-layers-toggle {
+  width: 36px;
+  height: 36px;
+}
+
+.leaflet-control-zoom a {
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+}
+
+.leaflet-control-zoom-in {
+  font-size: 18px !important;
+}
+
+.leaflet-control-zoom-out {
+  font-size: 20px !important;
+}

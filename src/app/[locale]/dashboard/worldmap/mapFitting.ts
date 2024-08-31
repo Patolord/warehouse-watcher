@@ -8,9 +8,14 @@ export const fitMapToMarkers = (map: L.Map, locations: Warehouse[]): void => {
   );
 
   if (validLocations.length > 0) {
-    const bounds = L.latLngBounds(
-      validLocations.map((l) => [l.latitude, l.longitude])
-    );
-    map.fitBounds(bounds);
+    if (validLocations.length === 1) {
+      // If there's only one location, center on it with a set zoom level
+      map.setView([validLocations[0].latitude, validLocations[0].longitude], 10);
+    } else {
+      const bounds = L.latLngBounds(
+        validLocations.map((l) => [l.latitude, l.longitude])
+      );
+      map.fitBounds(bounds);
+    }
   }
 };

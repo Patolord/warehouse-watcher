@@ -7,6 +7,7 @@ import { ArrowBigLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { MapPin } from "lucide-react"; // Add this import
 
 import MaterialCard from "./_components/InventoryCard";
 import { AddMaterialButton } from "./_components/buttons/add-button";
@@ -45,22 +46,25 @@ export default function WarehousePage({
 }: {
   params: { warehouseId: Id<"warehouses"> };
 }) {
-
   //Convex Queries
 
   const currentWarehouse = useQuery(api.warehouses.getWarehouseById, {
     warehouseId: params.warehouseId,
   });
   //query inventory information
-  const inventory = useQuery(api.inventories.getInventoryForDisplayByWarehouseId, {
-    warehouseId: params.warehouseId,
-  });
+  const inventory = useQuery(
+    api.inventories.getInventoryForDisplayByWarehouseId,
+    {
+      warehouseId: params.warehouseId,
+    }
+  );
 
-
-  const transactions = useQuery(api.transactions.getTransactionsForDisplayByWarehouseId, {
-    warehouseId: params.warehouseId,
-  });
-
+  const transactions = useQuery(
+    api.transactions.getTransactionsForDisplayByWarehouseId,
+    {
+      warehouseId: params.warehouseId,
+    }
+  );
 
   if (!inventory) {
     <div>Carregando...</div>;
@@ -78,18 +82,30 @@ export default function WarehousePage({
     setSelectedType(event.target.value);
   };
 
+  const mapLink = currentWarehouse
+    ? `/dashboard/worldmap?warehouseId=${params.warehouseId}&lat=${currentWarehouse.latitude}&lng=${currentWarehouse.longitude}`
+    : `/dashboard/worldmap?warehouseId=${params.warehouseId}`;
+
   if (isTablet) {
     return (
       <main className="flex flex-1 py-4 h-screen sm:h-fit flex-col space-y-2 px-4 relative">
-        <div className="flex items-center relative z-10">
-          <Button asChild variant="link">
-            <Link href="/dashboard/warehouses">
-              <ArrowBigLeft size={20} strokeWidth={1.75} />
+        <div className="flex items-center justify-between relative z-10">
+          <div className="flex items-center">
+            <Button asChild variant="link">
+              <Link href="/dashboard/warehouses">
+                <ArrowBigLeft size={20} strokeWidth={1.75} />
+              </Link>
+            </Button>
+            <h3 className="text-xl">
+              Materiais em &quot;{currentWarehouse?.name}&quot;
+            </h3>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link href={mapLink}>
+              <MapPin size={16} className="mr-2" />
+              Ver no mapa
             </Link>
           </Button>
-          <h3 className="text-xl">
-            Materiais em &quot;{currentWarehouse?.name}&quot;
-          </h3>
         </div>
         <Image
           src="/logistics.svg"
@@ -111,10 +127,12 @@ export default function WarehousePage({
               <Cart warehouseId={params.warehouseId} />
             </h2>
 
-            <div>{
-              inventory && inventory.length > 0 ? (<DataTable columns={columns} data={inventory} />)
-                : <div>Nenhum material cadastrado.</div>}
-
+            <div>
+              {inventory && inventory.length > 0 ? (
+                <DataTable columns={columns} data={inventory} />
+              ) : (
+                <div>Nenhum material cadastrado.</div>
+              )}
             </div>
           </TabsContent>
           <TabsContent value="movimentos">
@@ -131,13 +149,23 @@ export default function WarehousePage({
 
   return (
     <main className="flex flex-1 py-4 h-screen sm:h-fit flex-col space-y-2 px-4 relative">
-      <div className="flex items-center relative z-10">
-        <Button asChild variant="link">
-          <Link href="/dashboard/warehouses">
-            <ArrowBigLeft size={20} strokeWidth={1.75} />
+      <div className="flex items-center justify-between relative z-10">
+        <div className="flex items-center">
+          <Button asChild variant="link">
+            <Link href="/dashboard/warehouses">
+              <ArrowBigLeft size={20} strokeWidth={1.75} />
+            </Link>
+          </Button>
+          <h3 className="text-xl">
+            Materiais em &quot;{currentWarehouse?.name}&quot;
+          </h3>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href={mapLink}>
+            <MapPin size={16} className="mr-2" />
+            Ver no mapa
           </Link>
         </Button>
-        <h3 className="text-xl">Materiais em &quot;{currentWarehouse?.name}&quot;</h3>
       </div>
       <Image
         src="/logistics.svg"

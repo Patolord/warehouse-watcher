@@ -1,5 +1,7 @@
 import React from "react";
 import { TransactionWithWarehouseInfo } from "./types";
+import Link from "next/link";
+import { Button } from "@/components/ui/button"; // Assuming you're using a UI component library
 
 interface TransactionDetailsProps {
   transactions: TransactionWithWarehouseInfo[];
@@ -42,6 +44,11 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
               <strong>Date:</strong>{" "}
               {new Date(transaction._creationTime).toLocaleString()}
             </p>
+            <Button asChild className="mt-2">
+              <Link href={`/dashboard/transactions/${transaction._id}`}>
+                View Transaction Details
+              </Link>
+            </Button>
           </li>
         ))}
       </ul>

@@ -5,8 +5,7 @@ import dynamic from "next/dynamic";
 import L from "leaflet";
 import "leaflet-polylinedecorator";
 import { Warehouse, TransactionWithWarehouseInfo } from "./types";
-import { mapConfig, createIcon } from "./mapConfig";
-import { createMarkers } from "./markerCreation";
+import { mapConfig } from "./mapConfig";
 import { createTransactionPaths } from "./pathCreation";
 import { injectAnimationCSS } from "./utils";
 import {
@@ -14,10 +13,10 @@ import {
   addZoomControls,
   addScaleControl,
   addLayerControl,
-  addLegendControl,
 } from "./mapControls";
 import { fitMapToMarkers } from "./mapFitting";
-import WarehouseDetails from "./WarehouseDetails";
+import { Warehouse as WarehouseIcon, CircleDot } from "lucide-react";
+import ReactDOMServer from "react-dom/server";
 
 interface WorldMapProps {
   userWarehouses: Warehouse[];
@@ -27,6 +26,7 @@ interface WorldMapProps {
   onTransactionsSelect: (
     transactions: TransactionWithWarehouseInfo[] | null
   ) => void;
+  focusWarehouseId: string | null;
 }
 
 const WorldMap: React.FC<WorldMapProps> = ({
@@ -35,6 +35,7 @@ const WorldMap: React.FC<WorldMapProps> = ({
   transactions,
   onWarehouseSelect,
   onTransactionsSelect,
+  focusWarehouseId,
 }) => {
   const mapRef = useRef<L.Map | null>(null);
   const userWarehouseLayerRef = useRef<L.LayerGroup | null>(null);
@@ -69,10 +70,10 @@ const WorldMap: React.FC<WorldMapProps> = ({
         otherWarehouseLayerRef.current = L.layerGroup().addTo(map);
         transactionLayerRef.current = L.layerGroup().addTo(map);
 
-        // Add controls
         addZoomControls(map);
         addScaleControl(map);
-        addLegendControl(map);
+        // Remove this line:
+        // addLegendControl(map);
 
         map.invalidateSize();
 
@@ -84,80 +85,100 @@ const WorldMap: React.FC<WorldMapProps> = ({
   }, [mapLoaded]);
 
   useEffect(() => {
-    if (
-      !mapRef.current ||
-      !userWarehouseLayerRef.current ||
-      !otherWarehouseLayerRef.current ||
-      !transactionLayerRef.current ||
-      !baseLayerRef.current ||
-      !mapLoaded
-    )
-      return;
+    if (!mapRef.current || !mapLoaded) return;
 
     const map = mapRef.current;
 
-    // Clear existing layers
-    userWarehouseLayerRef.current.clearLayers();
-    otherWarehouseLayerRef.current.clearLayers();
-    transactionLayerRef.current.clearLayers();
+    userWarehouseLayerRef.current?.clearLayers();
+    otherWarehouseLayerRef.current?.clearLayers();
+    transactionLayerRef.current?.clearLayers();
 
-    // Add user warehouse markers
-    createMarkers(userWarehouses, map, (location) =>
-      createIcon(location, "user")
-    ).forEach((marker) => {
-      marker.on("click", () =>
-        onWarehouseSelect(marker.options.warehouse as Warehouse)
-      );
-      userWarehouseLayerRef.current!.addLayer(marker);
-    });
+    const createMarkerIcon = (isUserWarehouse: boolean) => {
+      const color = isUserWarehouse ? "#4CAF50" : "#FF5722";
+      return L.divIcon({
+        html: ReactDOMServer.renderToString(
+          <div
+            className={`custom-div-icon ${
+              isUserWarehouse ? "user-warehouse" : "other-warehouse"
+            }`}
+          >
+            <WarehouseIcon color={color} size={20} />
+          </div>
+        ),
+        className: "custom-div-icon",
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+      });
+    };
 
-    // Add other warehouse markers
-    createMarkers(otherWarehouses, map, (location) =>
-      createIcon(location, "other")
-    ).forEach((marker) => {
-      marker.on("click", () =>
-        onWarehouseSelect(marker.options.warehouse as Warehouse)
-      );
-      otherWarehouseLayerRef.current!.addLayer(marker);
-    });
+    const addWarehouseMarkers = (
+      warehouses: Warehouse[],
+      isUserWarehouse: boolean
+    ) => {
+      warehouses.forEach((warehouse) => {
+        if (warehouse.latitude && warehouse.longitude) {
+          const marker = L.marker([warehouse.latitude, warehouse.longitude], {
+            icon: createMarkerIcon(isUserWarehouse),
+          });
+          marker.on("click", () => onWarehouseSelect(warehouse));
+          (isUserWarehouse
+            ? userWarehouseLayerRef.current
+            : otherWarehouseLayerRef.current
+          )?.addLayer(marker);
+        }
+      });
+    };
 
-    // Add transaction paths
+    addWarehouseMarkers(userWarehouses, true);
+    addWarehouseMarkers(otherWarehouses, false);
+
     const transactionLayers = createTransactionPaths(
       transactions,
       map,
       onTransactionsSelect
     );
     transactionLayers.forEach((layer) => {
-      transactionLayerRef.current!.addLayer(layer);
+      transactionLayerRef.current?.addLayer(layer);
       if (layer instanceof L.Marker) {
-        layer.getElement()?.classList.add("cursor-pointer");
+        layer.on("click", (e) => {
+          L.DomEvent.stopPropagation(e);
+          // The onTransactionsSelect will be called within createTransactionPaths
+        });
       }
     });
 
-    // Update "Fit to Markers" control
     if (fitToMarkersControlRef.current) {
       map.removeControl(fitToMarkersControlRef.current);
     }
-    fitToMarkersControlRef.current = addFitToMarkersControl(map, [
-      ...userWarehouses,
-      ...otherWarehouses,
-    ]);
+    fitToMarkersControlRef.current = addFitToMarkersControl(
+      map,
+      userWarehouses
+    );
 
-    // Update layer control
     if (layerControlRef.current) {
       map.removeControl(layerControlRef.current);
     }
     layerControlRef.current = addLayerControl(
       map,
-      baseLayerRef.current,
-      userWarehouseLayerRef.current,
-      otherWarehouseLayerRef.current,
-      transactionLayerRef.current
+      baseLayerRef.current!,
+      userWarehouseLayerRef.current!,
+      otherWarehouseLayerRef.current!,
+      transactionLayerRef.current!
     );
 
-    // Fit map to markers only on initial load
     if (!initialFitDoneRef.current) {
-      fitMapToMarkers(map, [...userWarehouses, ...otherWarehouses]);
+      if (focusWarehouseId) {
+        const focusWarehouse = userWarehouses.find(
+          (w) => w._id === focusWarehouseId
+        );
+        if (focusWarehouse?.latitude && focusWarehouse?.longitude) {
+          map.setView([focusWarehouse.latitude, focusWarehouse.longitude], 10);
+        } else {
+          fitMapToMarkers(map, userWarehouses);
+        }
+      } else {
+        fitMapToMarkers(map, userWarehouses);
+      }
       initialFitDoneRef.current = true;
     }
   }, [
@@ -167,16 +188,39 @@ const WorldMap: React.FC<WorldMapProps> = ({
     mapLoaded,
     onWarehouseSelect,
     onTransactionsSelect,
+    focusWarehouseId,
   ]);
 
   return (
     <div className="relative h-full w-full">
       <div id="map" className="h-full w-full rounded-lg overflow-hidden" />
-      <div className="absolute top-4 left-4 z-[1000] bg-white p-2 rounded shadow">
-        <h2 className="font-bold mb-2">Map Statistics</h2>
-        <p>User Warehouses: {userWarehouses.length}</p>
-        <p>Other Warehouses: {otherWarehouses.length}</p>
-        <p>Transactions: {transactions.length}</p>
+      <div className="absolute bottom-4 left-4 z-[1000] bg-white p-4 rounded-lg shadow-md">
+        <h2 className="font-bold mb-2 text-lg">Map Information</h2>
+        <div className="flex justify-between items-start">
+          <div className="mr-8">
+            <div className="flex items-center mb-1">
+              <WarehouseIcon color="#4CAF50" size={16} className="mr-2" />
+              <span className="text-sm">
+                User Warehouse:{" "}
+                <span className="font-semibold">{userWarehouses.length}</span>
+              </span>
+            </div>
+            <div className="flex items-center mb-1">
+              <WarehouseIcon color="#FF5722" size={16} className="mr-2" />
+              <span className="text-sm">
+                Other Warehouse:{" "}
+                <span className="font-semibold">{otherWarehouses.length}</span>
+              </span>
+            </div>
+            <div className="flex items-center">
+              <CircleDot color="#3388ff" size={16} className="mr-2" />
+              <span className="text-sm">
+                Transaction:{" "}
+                <span className="font-semibold">{transactions.length}</span>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
