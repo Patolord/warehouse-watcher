@@ -215,7 +215,7 @@ export const getTransactionsWithLocations = query({
 
     const transactions = await ctx.db
       .query("transactions")
-      .filter((q) => q.eq(q.field("userId").slice(0, userId.length), userId))
+      .filter((q) => q.eq(q.field("userId"), userId))
       .collect();
 
     console.log("Number of transactions found:", transactions.length);
