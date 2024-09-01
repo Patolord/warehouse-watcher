@@ -25,6 +25,12 @@ export const createWarehouse = mutation({
       longitude: args.longitude,
     });
 
+    // Create an activity for the warehouse creation using the provided message
+    await ctx.scheduler.runAfter(0, internal.activities.createActivity, {
+      actionType: "warehouseCreated",
+      time: new Date().toISOString(),
+    });
+
     const warehouseText = `${args.name}. Located at: ${args.address || ""}. Coordinates: ${args.latitude}, ${args.longitude}`;
     await ctx.scheduler.runAfter(0, internal.embeddings.createEmbedding, {
       userId,

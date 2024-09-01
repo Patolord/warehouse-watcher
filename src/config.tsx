@@ -4,8 +4,8 @@ import { usePathname } from "next/navigation";
 export const NavItems = () => {
   const pathname = usePathname();
 
-  function isNavItemActive(pathname: string, nav: string) {
-    return pathname.includes(nav);
+  function isNavItemActive(pathname: string | null, nav: string) {
+    return pathname?.includes(nav) ?? false;
   }
 
   return [
@@ -44,6 +44,6 @@ export const NavItems = () => {
       icon: <Sparkles size={20} color="#800080" />,
       active: isNavItemActive(pathname, "chat"),
       position: "top",
-    },];
+    },
+  ];
 };
-

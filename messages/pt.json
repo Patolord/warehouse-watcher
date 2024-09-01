@@ -81,10 +81,9 @@
     "transactionsTitle": "Transações",
     "transactionsFound": "transações encontradas para este material",
     "actionType": {
-     
       "added": "Adicionado",
       "removed": "Removido",
-      "transfer": "Transferência"
+      "transfered": "Transferência"
     },
     "noActionType": "Sem Tipo de Ação",
     "from": "De",
@@ -94,5 +93,44 @@
     "versionsFound": "versões encontradas para este material",
     "noName": "Sem Nome",
     "noVersionsFound": "Nenhuma versão encontrada."
+  },
+  "Dashboard": {
+    "recentActivities": "Atividades Recentes",
+    "actions": {
+      "warehouseCreated": "Estoque Criado",
+      "materialAdded": "Material Adicionado",
+      "materialRemoved": "Material Removido",
+      "materialTransferred": "Material Transferido"
+    }
+  },
+  "AdditionalAttributesCard": {
+    "addField": "Adicionar Campo",
+    "addCustomField": "Adicionar Campo Personalizado",
+    "customFields": "Campos Personalizados",
+    "removeField": "Remover Campo {fieldName}",
+    "save": "Salvar Alterações",
+    "newAttributePlaceholder": "Nome do novo atributo",
+    "addAttribute": "Adicionar Atributo",
+    "edit": "Editar",
+    "noCustomFields": "Nenhum campo personalizado encontrado."
+  },
+  "AddAttributeModal": {
+    "addField": "Adicionar Campo",
+    "addNewField": "Adicionar Novo Campo",
+    "fieldName": "Nome do Campo",
+    "fieldNamePlaceholder": "ex., Marca, Peso",
+    "fieldType": "Tipo do Campo",
+    "selectType": "Selecione o tipo",
+    "text": "Texto",
+    "number": "Número",
+    "fieldValue": "Valor do Campo",
+    "fieldValuePlaceholder": "Digite o valor",
+    "add": "Adicionar"
+  },
+  "EditAttributesModal": {
+    "editCustomFields": "Editar Campos Personalizados",
+    "newAttributePlaceholder": "Nome do novo atributo",
+    "addAttribute": "Adicionar Novo Atributo",
+    "save": "Salvar Alterações"
   }
 }

@@ -15,8 +15,8 @@ const DynamicWorldMap = dynamic(() => import("./Worldmap"), {
 });
 
 const WarehousePage: React.FC = () => {
-  const searchParams = useSearchParams(); // Add this line
-  const warehouseId = searchParams.get("warehouseId"); // Add this line
+  const searchParams = useSearchParams();
+  const warehouseId = searchParams?.get("warehouseId") ?? "";
 
   const userWarehouses = useQuery(api.warehouses.getWarehousesByUser);
   const allWarehouses = useQuery(api.warehouses.getWarehouses);

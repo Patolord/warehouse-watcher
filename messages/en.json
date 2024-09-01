@@ -87,7 +87,7 @@
     "actionType": {
       "added": "Added",
       "removed": "Removed",
-      "transfer": "Transfer"
+      "transfered": "Transfer"
     },
     "noActionType": "No Action Type",
     "from": "From",
@@ -97,5 +97,26 @@
     "versionsFound": "versions found for this material",
     "noName": "No Name",
     "noVersionsFound": "No versions found."
+  },
+  "Dashboard": {
+    "recentActivities": "Recent Activities",
+    "actions": {
+      "warehouseCreated": "Warehouse Created",
+      "materialAdded": "Material Added",
+      "materialRemoved": "Material Removed",
+      "materialTransferred": "Material Transferred"
+    }
+  },
+  "AdditionalAttributesCard": {
+    "addField": "Add Field",
+    "customFields": "Custom Fields",
+    "edit": "Edit Custom Fields",
+    "noCustomFields": "No custom fields have been added yet."
+  },
+  "EditAttributesModal": {
+    "editCustomFields": "Edit Custom Fields",
+    "newAttributePlaceholder": "New attribute name",
+    "addAttribute": "Add New Attribute",
+    "save": "Save Changes"
   }
 }

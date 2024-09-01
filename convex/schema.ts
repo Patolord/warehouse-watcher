@@ -4,6 +4,10 @@ import { v } from "convex/values";
 
 const schema = defineSchema({
   ...authTables,
+  activities: defineTable({
+    actionType: v.string(),
+    time: v.string(),
+  }),
   materials: defineTable({
     userId: v.string(),
     name: v.string(),

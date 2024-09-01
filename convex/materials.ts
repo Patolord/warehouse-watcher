@@ -119,6 +119,7 @@ export const createMaterial = mutation({
     type: v.optional(v.string()),
     imageFileId: v.optional(v.id("_storage")),
     additionalAttributes: v.optional(v.any()),
+    monetaryValue: v.optional(v.number()), // Add this line
   },
   async handler(ctx, args) {
     const userId = await auth.getUserId(ctx);
@@ -126,7 +127,7 @@ export const createMaterial = mutation({
       throw new ConvexError("User not authenticated");
     }
 
-    const { name, type, imageFileId, additionalAttributes } = args;
+    const { name, type, imageFileId, additionalAttributes, monetaryValue } = args; // Add monetaryValue
 
     // Check for existing material with the same name
     const existing = await ctx.db
@@ -144,7 +145,10 @@ export const createMaterial = mutation({
       name,
       type,
       imageFileId,
-      additionalAttributes,
+      additionalAttributes: {
+        ...additionalAttributes,
+        monetaryValue, // Add this line
+      },
     });
 
     // Create the initial version of the material
@@ -210,9 +214,10 @@ export const updateMaterialById = mutation({
     materialId: v.id("materials"),
     name: v.string(),
     type: v.optional(v.string()),
+    monetaryValue: v.optional(v.number()), // Add this line
   },
   async handler(ctx, args) {
-    const { materialId, name, type } = args;
+    const { materialId, name, type, monetaryValue } = args; // Add monetaryValue
 
     // Get the current material
     const currentMaterial = await ctx.db.get(materialId);
@@ -233,19 +238,12 @@ export const updateMaterialById = mutation({
       }
     }
 
-    // Get the user ID from the auth context (uncomment if needed)
-    /*
-    const userId = ctx.auth.userId;
-    if (!userId) {
-      throw new ConvexError("User must be authenticated to update materials");
-    }
-    */
-
     // Check if there are any changes
     const hasNameChange = name !== currentMaterial.name;
     const hasTypeChange = type !== currentMaterial.type;
+    const hasMonetaryValueChange = monetaryValue !== currentMaterial.additionalAttributes?.monetaryValue;
 
-    if (hasNameChange || hasTypeChange) {
+    if (hasNameChange || hasTypeChange || hasMonetaryValueChange) {
       // Get the latest version
       const latestVersion = await ctx.db
         .query("materialVersions")
@@ -267,6 +265,10 @@ export const updateMaterialById = mutation({
       await ctx.db.patch(materialId, {
         name,
         type,
+        additionalAttributes: {
+          ...currentMaterial.additionalAttributes,
+          monetaryValue, // Add this line
+        },
         currentVersionId: newVersionId,
       });
 
@@ -292,6 +294,97 @@ export const updateMaterialById = mutation({
       success: false,
       updatedMaterial: currentMaterial,
       message: "No changes were made.",
+    };
+  },
+});
+
+export const addMonetaryValue = mutation({
+  args: {
+    materialId: v.id("materials"),
+    monetaryValue: v.number(),
+  },
+  async handler(ctx, args) {
+    const { materialId, monetaryValue } = args;
+
+    // Get the current material
+    const currentMaterial = await ctx.db.get(materialId);
+
+    if (!currentMaterial) {
+      throw new ConvexError("No active material found for the given ID");
+    }
+
+    // Update the material record with the new monetary value
+    await ctx.db.patch(materialId, {
+      additionalAttributes: {
+        ...currentMaterial.additionalAttributes,
+        monetaryValue,
+      },
+    });
+
+    return {
+      success: true,
+      updatedMaterial: await ctx.db.get(materialId),
+    };
+  },
+});
+
+export const addOrUpdateAdditionalAttribute = mutation({
+  args: {
+    materialId: v.id("materials"),
+    attributeName: v.string(),
+    attributeValue: v.any(),
+  },
+  async handler(ctx, args) {
+    const { materialId, attributeName, attributeValue } = args;
+
+    // Get the current material
+    const currentMaterial = await ctx.db.get(materialId);
+
+    if (!currentMaterial) {
+      throw new ConvexError("No active material found for the given ID");
+    }
+
+    // Update the material record with the new attribute
+    await ctx.db.patch(materialId, {
+      additionalAttributes: {
+        ...currentMaterial.additionalAttributes,
+        [attributeName]: attributeValue,
+      },
+    });
+
+    return {
+      success: true,
+      updatedMaterial: await ctx.db.get(materialId),
+    };
+  },
+});
+
+export const deleteAdditionalAttribute = mutation({
+  args: {
+    materialId: v.id("materials"),
+    attributeName: v.string(),
+  },
+  async handler(ctx, args) {
+    const { materialId, attributeName } = args;
+
+    // Get the current material
+    const currentMaterial = await ctx.db.get(materialId);
+
+    if (!currentMaterial) {
+      throw new ConvexError("No active material found for the given ID");
+    }
+
+    // Remove the attribute from the additionalAttributes
+    const { [attributeName]: _, ...updatedAttributes } = currentMaterial.additionalAttributes;
+
+    // Update the material record with the updated attributes
+    await ctx.db.patch(materialId, {
+      additionalAttributes: updatedAttributes,
+    });
+
+    return {
+      success: true,
+      updatedMaterial: await ctx.db.get(materialId),
     };
   },
 });

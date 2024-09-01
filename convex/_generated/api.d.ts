@@ -14,6 +14,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as activities from "../activities.js";
 import type * as auth from "../auth.js";
 import type * as embeddings from "../embeddings.js";
 import type * as http from "../http.js";
@@ -40,6 +41,7 @@ import type * as warehouses from "../warehouses.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  activities: typeof activities;
   auth: typeof auth;
   embeddings: typeof embeddings;
   http: typeof http;
