@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState, useEffect } from "react";
 import { useConvexAuth } from "convex/react";
@@ -46,7 +46,11 @@ export default function Header() {
           <span>Loading...</span>
         ) : isAuthenticated ? (
           <>
-            {viewer && <span className="hidden md:inline">{viewer.email}</span>}
+            {viewer && (
+              <span className="hidden md:inline">
+                {viewer.name || viewer.email}
+              </span>
+            )}
             <SignOutButton />
             <button onClick={toggleNav} className="md:hidden">
               <Menu size={24} />

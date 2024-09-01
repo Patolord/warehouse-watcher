@@ -92,14 +92,15 @@ export const updateInventory = mutation({
           ctx,
           fromWarehouse,
           materialId,
-          -quantity
+          -quantity,
+          userId
         );
-        await updateWarehouseInventory(ctx, toWarehouse, materialId, quantity);
+        await updateWarehouseInventory(ctx, toWarehouse, materialId, quantity, userId);
       } else if (actionType === "added") {
         if (!toWarehouse) {
           throw new ConvexError("toWarehouse is required for additions");
         }
-        await updateWarehouseInventory(ctx, toWarehouse, materialId, quantity);
+        await updateWarehouseInventory(ctx, toWarehouse, materialId, quantity, userId);
       } else if (actionType === "removed") {
         if (!fromWarehouse) {
           throw new ConvexError("fromWarehouse is required for removals");
@@ -108,7 +109,8 @@ export const updateInventory = mutation({
           ctx,
           fromWarehouse,
           materialId,
-          -quantity
+          -quantity,
+          userId
         );
       }
     }
@@ -183,13 +185,15 @@ async function updateWarehouseInventory(
   ctx: MutationCtx,
   warehouseId: Id<"warehouses">,
   materialId: Id<"materials">,
-  quantityChange: number
+  quantityChange: number,
+  userId: string // Add userId parameter
 ) {
   const existingInventory = await ctx.db
     .query("inventories")
     .withIndex("by_warehouse_and_material", (q) =>
       q.eq("warehouseId", warehouseId).eq("materialId", materialId)
     )
+    .filter((q) => q.eq(q.field("userId"), userId)) // Add this line
     .unique();
 
   if (existingInventory) {
@@ -210,6 +214,7 @@ async function updateWarehouseInventory(
       warehouseId: warehouseId,
       materialId: materialId,
       quantity: quantityChange,
+      userId: userId, // Add this line
     });
   }
 }
@@ -217,9 +222,15 @@ async function updateWarehouseInventory(
 export const getInventoryByWarehouseId = query({
   args: { warehouseId: v.id("warehouses") },
   handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("User not authenticated");
+    }
+
     const inventories = await ctx.db
       .query("inventories")
       .withIndex("by_warehouse", (q) => q.eq("warehouseId", args.warehouseId))
+      .filter((q) => q.eq(q.field("userId"), userId)) // Add this line
       .collect();
 
     const inventoriesWithMaterialDetails = await Promise.all(
@@ -259,9 +270,15 @@ type InventoryItem = {
 export const getInventoryForDisplayByWarehouseId = query({
   args: { warehouseId: v.id("warehouses") },
   handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("User not authenticated");
+    }
+
     const inventories = await ctx.db
       .query("inventories")
       .withIndex("by_warehouse", (q) => q.eq("warehouseId", args.warehouseId))
+      .filter((q) => q.eq(q.field("userId"), userId)) // Add this line
       .collect();
 
     const inventoriesForDisplay: (InventoryItem | null)[] = await Promise.all(

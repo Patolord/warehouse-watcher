@@ -43,13 +43,15 @@ const schema = defineSchema({
     .index("by_transaction", ["transaction"]) // Index to quickly find all materials in a transaction
     .index("by_material", ["materialId"]), // Index to quickly find all transactions for a material
   inventories: defineTable({
+    userId: v.string(), // Add this line
     warehouseId: v.id("warehouses"),
     materialId: v.id("materials"),
     quantity: v.number(),
   })
     .index("by_warehouse", ["warehouseId"])
     .index("by_material", ["materialId"])
-    .index("by_warehouse_and_material", ["warehouseId", "materialId"]),
+    .index("by_warehouse_and_material", ["warehouseId", "materialId"])
+    .index("by_userId", ["userId"]), // Add this line
   material_audit_logs: defineTable({
     materialId: v.id("materials"),
     oldName: v.string(),

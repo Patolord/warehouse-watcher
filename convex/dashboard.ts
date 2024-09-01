@@ -62,7 +62,7 @@ export const getStockLevels = query({
 
         const inventories = await ctx.db
             .query("inventories")
-            .withIndex("by_material", (q) => q)
+            .withIndex("by_userId", (q) => q.eq("userId", userId))
             .collect();
 
         const stockLevelsMap = new Map<string, { id: string, name: string, quantity: number }>();
@@ -70,17 +70,19 @@ export const getStockLevels = query({
         await Promise.all(
             inventories.map(async (inventory) => {
                 const material = await ctx.db.get(inventory.materialId);
-                const name = material?.name || "Unknown";
+                if (material && material.userId === userId) {
+                    const name = material.name || "Unknown";
 
-                if (stockLevelsMap.has(name)) {
-                    const existingStock = stockLevelsMap.get(name)!;
-                    existingStock.quantity += inventory.quantity;
-                } else {
-                    stockLevelsMap.set(name, {
-                        id: inventory._id,
-                        name,
-                        quantity: inventory.quantity,
-                    });
+                    if (stockLevelsMap.has(name)) {
+                        const existingStock = stockLevelsMap.get(name)!;
+                        existingStock.quantity += inventory.quantity;
+                    } else {
+                        stockLevelsMap.set(name, {
+                            id: inventory._id,
+                            name,
+                            quantity: inventory.quantity,
+                        });
+                    }
                 }
             })
         );
