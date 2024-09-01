@@ -1,58 +1,73 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, DollarSign, TrendingUp, AlertTriangle } from "lucide-react";
-import { useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
+import { useTranslations } from "next-intl";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function StatsCards() {
-  const [error, setError] = useState<Error | null>(null);
+  const t = useTranslations("Dashboard.statsCards");
+  const stats = useQuery(api.dashboard.getStats);
 
-  if (error) {
-    return <div>Error loading stats: {error.message}</div>;
+  if (stats === undefined) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+      </div>
+    );
+  }
+
+  if (Object.values(stats).every((value) => value === 0)) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <p className="text-center text-muted-foreground">
+            {t("noStatsAvailable")}
+          </p>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      <Card className="border-t-4 border-t-[#0066cc]">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-          <Package className="h-4 w-4 text-[#0066cc]" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-[#0066cc]">1,234</div>
-          <p className="text-xs text-muted-foreground">+10% from last month</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-          <DollarSign className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">$1,234,567</div>
-          <p className="text-xs text-muted-foreground">+5% from last month</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Stock Turnover</CardTitle>
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">4.5</div>
-          <p className="text-xs text-muted-foreground">-2% from last month</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
-          <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">12</div>
-          <p className="text-xs text-muted-foreground">Action needed</p>
-        </CardContent>
-      </Card>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <StatCard title={t("totalMaterials")} value={stats.totalMaterials} />
+      <StatCard title={t("totalWarehouses")} value={stats.totalWarehouses} />
+      <StatCard
+        title={t("totalTransactions")}
+        value={stats.totalTransactions}
+      />
+      <StatCard title={t("totalUsers")} value={stats.totalUsers} />
     </div>
+  );
+}
+
+function StatCard({ title, value }: { title: string; value: number }) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function StatCardSkeleton() {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Skeleton className="h-4 w-[100px]" />
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-8 w-[60px]" />
+      </CardContent>
+    </Card>
   );
 }

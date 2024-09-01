@@ -1,65 +1,58 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
+import { useTranslations } from "next-intl";
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
-
-const inventoryTrends = [
-  { date: "2023-01", total: 1000 },
-  { date: "2023-02", total: 1200 },
-  { date: "2023-03", total: 1100 },
-  { date: "2023-04", total: 1300 },
-  { date: "2023-05", total: 1500 },
-];
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function InventoryTrends() {
-  const [error, setError] = useState<Error | null>(null);
-
-  if (error) {
-    return <div>Error loading inventory trends: {error.message}</div>;
-  }
+  const t = useTranslations("Dashboard.inventoryTrends");
+  const trends = useQuery(api.dashboard.getInventoryTrends);
 
   return (
     <Card className="col-span-4">
       <CardHeader>
-        <CardTitle>Inventory Trends</CardTitle>
+        <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={inventoryTrends}
-              margin={{
-                top: 5,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
+        {trends === undefined ? (
+          <InventoryTrendsSkeleton />
+        ) : trends.length === 0 ? (
+          <p className="text-center text-muted-foreground">
+            {t("noTrendsAvailable")}
+          </p>
+        ) : (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={trends}>
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="total"
-                stroke="#0066cc"
-                activeDot={{ r: 8 }}
-              />
+              <Line type="monotone" dataKey="count" stroke="#8884d8" />
             </LineChart>
           </ResponsiveContainer>
-        </div>
+        )}
       </CardContent>
     </Card>
+  );
+}
+
+function InventoryTrendsSkeleton() {
+  return (
+    <div className="space-y-2">
+      <Skeleton className="h-[300px] w-full" />
+      <div className="flex justify-between">
+        <Skeleton className="h-4 w-[100px]" />
+        <Skeleton className="h-4 w-[100px]" />
+      </div>
+    </div>
   );
 }

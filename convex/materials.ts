@@ -6,6 +6,7 @@ import { queryTransactionsContainingMaterial } from "./transactions";
 import { auth } from "./auth";
 import { internal } from "./_generated/api";
 import { getUserId } from "./embeddings";
+import { nanoid } from 'nanoid';
 
 //queries
 export const getMaterialsByUser = query({
@@ -119,7 +120,7 @@ export const createMaterial = mutation({
     type: v.optional(v.string()),
     imageFileId: v.optional(v.id("_storage")),
     additionalAttributes: v.optional(v.any()),
-    monetaryValue: v.optional(v.number()), // Add this line
+    monetaryValue: v.optional(v.number()),
   },
   async handler(ctx, args) {
     const userId = await auth.getUserId(ctx);
@@ -127,7 +128,7 @@ export const createMaterial = mutation({
       throw new ConvexError("User not authenticated");
     }
 
-    const { name, type, imageFileId, additionalAttributes, monetaryValue } = args; // Add monetaryValue
+    const { name, type, imageFileId, additionalAttributes, monetaryValue } = args;
 
     // Check for existing material with the same name
     const existing = await ctx.db
@@ -139,6 +140,8 @@ export const createMaterial = mutation({
       throw new ConvexError("Material já existe");
     }
 
+    const qrCode = nanoid(); // Generate a unique ID for the QR code
+
     // Create the main material record
     const materialId = await ctx.db.insert("materials", {
       userId: userId,
@@ -147,8 +150,16 @@ export const createMaterial = mutation({
       imageFileId,
       additionalAttributes: {
         ...additionalAttributes,
-        monetaryValue, // Add this line
+        monetaryValue,
       },
+      qrCode, // Add the QR code to the material
+    });
+
+    // Create an activity for the material creation
+    await ctx.scheduler.runAfter(0, internal.activities.createActivity, {
+      actionType: "materialCreated",
+      time: new Date().toISOString(),
+      details: { materialId, materialName: name },
     });
 
     // Create the initial version of the material
@@ -170,7 +181,7 @@ export const createMaterial = mutation({
       text: materialText,
     });
 
-    return { materialId, versionId };
+    return { materialId, versionId, qrCode };
   },
 });
 
@@ -214,10 +225,10 @@ export const updateMaterialById = mutation({
     materialId: v.id("materials"),
     name: v.string(),
     type: v.optional(v.string()),
-    monetaryValue: v.optional(v.number()), // Add this line
+    monetaryValue: v.optional(v.number()),
   },
   async handler(ctx, args) {
-    const { materialId, name, type, monetaryValue } = args; // Add monetaryValue
+    const { materialId, name, type, monetaryValue } = args;
 
     // Get the current material
     const currentMaterial = await ctx.db.get(materialId);
@@ -267,7 +278,7 @@ export const updateMaterialById = mutation({
         type,
         additionalAttributes: {
           ...currentMaterial.additionalAttributes,
-          monetaryValue, // Add this line
+          monetaryValue,
         },
         currentVersionId: newVersionId,
       });

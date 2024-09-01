@@ -34,6 +34,7 @@ import { api } from "../../../../../../convex/_generated/api";
 import AdditionalAttributesCard from "./AdditionalAttributesCard";
 import EditAttributesModal from "./EditAttributesModal";
 import AddAttributeModal from "./AddAttributeModal";
+import { MaterialQRCode } from "@/components/MaterialQRCode";
 
 export default function MaterialPage({
   params,
@@ -121,7 +122,7 @@ export default function MaterialPage({
   };
 
   return (
-    <main className="container mx-auto py-6 space-y-6">
+    <main className="container mx-auto p-4 space-y-4">
       <Card className="overflow-hidden">
         <div className="flex items-start space-x-4 p-6">
           <div className="relative h-24 w-24 flex-shrink-0">
@@ -284,6 +285,17 @@ export default function MaterialPage({
           )}
         </CardContent>
       </Card>
+
+      {material.qrCode && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("qrCode")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MaterialQRCode value={material.qrCode} />
+          </CardContent>
+        </Card>
+      )}
     </main>
   );
 }

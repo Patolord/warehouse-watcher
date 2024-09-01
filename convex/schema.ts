@@ -7,6 +7,7 @@ const schema = defineSchema({
   activities: defineTable({
     actionType: v.string(),
     time: v.string(),
+    details: v.optional(v.any()),
   }),
   materials: defineTable({
     userId: v.string(),
@@ -15,6 +16,7 @@ const schema = defineSchema({
     imageFileId: v.optional(v.id("_storage")),
     additionalAttributes: v.optional(v.any()),
     currentVersionId: v.optional(v.id("materialVersions")),
+    qrCode: v.optional(v.string()),
   })
     .index("by_name", ["name"])
     .index("by_user_and_type", ["userId", "type"]),

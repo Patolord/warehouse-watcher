@@ -7,4 +7,5 @@ export type InventoryItem = {
     warehouseId: Id<"warehouses">;
     imageUrl: string | null;
     materialType: string | undefined;
+    qrCode?: string; // Add this line
 };
