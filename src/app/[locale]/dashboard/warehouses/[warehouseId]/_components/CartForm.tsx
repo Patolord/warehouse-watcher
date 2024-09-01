@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,12 +26,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getStore } from "@/store/store";
+import { Dispatch, SetStateAction } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function CartForm({
   warehouseId,
+  setIsOpen,
 }: {
   warehouseId: Id<"warehouses">;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const useStore = getStore(warehouseId);
   const { inventoryItems, reset } = useStore(
     useShallow((state) => ({
@@ -86,7 +92,10 @@ export default function CartForm({
     },
   });
 
+  const { toast } = useToast();
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
     const materials = inventoryItems.map((item) => ({
       materialId: item.materialId,
       quantity: item.cartQuantity,
@@ -107,22 +116,48 @@ export default function CartForm({
     try {
       await updateInventory({
         fromWarehouse: warehouseId,
-        toWarehouse: values.consumeHere ? undefined : values.toWarehouseId as Id<"warehouses">,
+        toWarehouse: values.consumeHere
+          ? undefined
+          : (values.toWarehouseId as Id<"warehouses">),
         actionType: values.consumeHere ? "removed" : "transfered",
         materials: materials,
         description: values.description,
       });
 
-      await fetch("https://projectplannerai.com/api/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: "User realized a transaction", projectId: process.env.NEXT_PUBLIC_PROJECT_PLANNER_ID }),
-      });
+      const successMessage = values.consumeHere
+        ? "Materiais consumidos com sucesso!"
+        : "Transferência realizada com sucesso!";
 
-      toast.success(values.consumeHere ? "Materiais consumidos com sucesso!" : "Transferência realizada com sucesso!");
       reset();
+      toast({
+        title: "Sucesso",
+        description: successMessage,
+      });
+      setIsOpen(false); // Close the sheet after successful submission
+
+      // Move the projectplannerai fetch outside the main try-catch block
+      try {
+        await fetch("https://projectplannerai.com/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            key: "User realized a transaction",
+            projectId: process.env.NEXT_PUBLIC_PROJECT_PLANNER_ID,
+          }),
+        });
+      } catch (error) {
+        // Silently handle the error or log it if needed
+        console.error("Failed to send event to projectplannerai:", error);
+      }
     } catch (error) {
-      toast.error("Erro ao processar a operação: " + (error as Error).message);
+      toast({
+        title: "Erro",
+        description:
+          "Erro ao processar a operação: " + (error as Error).message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -197,8 +232,12 @@ export default function CartForm({
             </div>
           )}
 
-          <Button type="submit">
-            {form.watch("consumeHere") ? "Consumir" : "Transferir"}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting
+              ? "Processando..."
+              : form.watch("consumeHere")
+                ? "Consumir"
+                : "Transferir"}
           </Button>
         </div>
       </form>

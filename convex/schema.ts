@@ -19,7 +19,8 @@ const schema = defineSchema({
     qrCode: v.optional(v.string()),
   })
     .index("by_name", ["name"])
-    .index("by_user_and_type", ["userId", "type"]),
+    .index("by_user_and_type", ["userId", "type"])
+    .index("by_user_and_name", ["userId", "name"]),
   warehouses: defineTable({
     userId: v.string(),
     name: v.string(),

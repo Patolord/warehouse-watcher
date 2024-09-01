@@ -10,12 +10,37 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import MaterialList from "./MaterialList";
 import { NewMaterialDialog } from "./NewMaterialDialog";
@@ -25,10 +50,16 @@ const materialSchema = z.object({
   quantity: z.coerce.number().min(1),
 });
 
-export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
+export function AddMaterialButton({
+  warehouseId,
+}: {
+  warehouseId: Id<"warehouses">;
+}) {
   const createTransaction = useMutation(api.inventories.updateInventory);
   const materials = useQuery(api.materials.getMaterialsByUser);
-  const [materialsList, setMaterialsList] = useState<{ materialId: Id<"materials">; materialName: string; quantity: number }[]>([]);
+  const [materialsList, setMaterialsList] = useState<
+    { materialId: Id<"materials">; materialName: string; quantity: number }[]
+  >([]);
   const [orderDescription, setOrderDescription] = useState("");
   const [open, setOpen] = useState(false);
   const [isNewMaterialDialogOpen, setIsNewMaterialDialogOpen] = useState(false);
@@ -42,15 +73,29 @@ export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses
     setMaterialsList((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const { handleSubmit, reset, getValues, formState: { isSubmitting } } = form;
+  const {
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { isSubmitting },
+  } = form;
 
   const onAddMaterial = () => {
     const { materialId, quantity } = getValues();
     const material = materials!.find((mat) => mat._id === materialId);
     if (material) {
-      const isAlreadyAdded = materialsList.some((item) => item.materialId === materialId);
+      const isAlreadyAdded = materialsList.some(
+        (item) => item.materialId === materialId
+      );
       if (!isAlreadyAdded) {
-        setMaterialsList([...materialsList, { materialId: material._id, materialName: material.name, quantity: Number(quantity) }]);
+        setMaterialsList([
+          ...materialsList,
+          {
+            materialId: material._id,
+            materialName: material.name,
+            quantity: Number(quantity),
+          },
+        ]);
       } else {
         toast.error("Material já adicionado à lista.");
       }
@@ -61,7 +106,10 @@ export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses
   const onSubmit = async () => {
     try {
       const orderData = {
-        materials: materialsList.map(({ materialId, quantity }) => ({ materialId, quantity })),
+        materials: materialsList.map(({ materialId, quantity }) => ({
+          materialId,
+          quantity,
+        })),
         description: orderDescription,
         toWarehouse: warehouseId,
       };
@@ -73,22 +121,38 @@ export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses
         description: orderData.description,
       });
 
-      await fetch("https://projectplannerai.com/api/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: "User added a material to a warehouse", projectId: process.env.NEXT_PUBLIC_PROJECT_PLANNER_ID }),
-      });
-
       setMaterialsList([]);
       setOrderDescription("");
       toast.success("Movimentação criada com sucesso!");
+
+      // Move the projectplannerai fetch outside the main try-catch block
+      try {
+        await fetch("https://projectplannerai.com/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            key: "User added a material to a warehouse",
+            projectId: process.env.NEXT_PUBLIC_PROJECT_PLANNER_ID,
+          }),
+        });
+      } catch (error) {
+        // Silently handle the error or log it if needed
+        console.error("Failed to send event to projectplannerai:", error);
+      }
     } catch (error) {
-      const errorMessage = error instanceof ConvexError ? (error.data as { message: string }).message : "Erro inesperado";
+      const errorMessage =
+        error instanceof ConvexError
+          ? (error.data as { message: string }).message
+          : "Erro inesperado";
       toast.error(errorMessage);
     }
   };
 
-  const handleNewMaterialCreated = (newMaterial: { materialId: Id<"materials">; versionId: Id<"materialVersions">; name: string }) => {
+  const handleNewMaterialCreated = (newMaterial: {
+    materialId: Id<"materials">;
+    versionId: Id<"materialVersions">;
+    name: string;
+  }) => {
     form.setValue("materialId", newMaterial.materialId);
     // If you need to update the materials list, you might want to refetch or update it here
     // For example:
@@ -124,10 +188,15 @@ export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses
                             variant="outline"
                             role="combobox"
                             aria-expanded={open}
-                            className={cn("justify-between w-full", !field.value && "text-muted-foreground")}
+                            className={cn(
+                              "justify-between w-full",
+                              !field.value && "text-muted-foreground"
+                            )}
                           >
                             {field.value
-                              ? materials?.find((material) => material._id === field.value)?.name || "Selecione o material"
+                              ? materials?.find(
+                                  (material) => material._id === field.value
+                                )?.name || "Selecione o material"
                               : "Selecione o material"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
@@ -135,9 +204,14 @@ export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses
                       </PopoverTrigger>
                       <PopoverContent className="p-0 w-full">
                         <Command className="w-full">
-                          <CommandInput placeholder="Buscar material..." className="w-full" />
+                          <CommandInput
+                            placeholder="Buscar material..."
+                            className="w-full"
+                          />
                           <CommandList className="max-h-[200px]">
-                            <CommandEmpty>Nenhum material encontrado.</CommandEmpty>
+                            <CommandEmpty>
+                              Nenhum material encontrado.
+                            </CommandEmpty>
                             <CommandGroup>
                               {materials?.map((material) => (
                                 <CommandItem
@@ -148,7 +222,14 @@ export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses
                                     setOpen(false);
                                   }}
                                 >
-                                  <Check className={cn("mr-2 h-4 w-4", material._id === field.value ? "opacity-100" : "opacity-0")} />
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      material._id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
                                   {material.name}
                                 </CommandItem>
                               ))}
@@ -181,13 +262,23 @@ export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses
                   <FormItem>
                     <FormLabel>Quantidade</FormLabel>
                     <FormControl>
-                      <Input type="number" min={1} {...field} className="w-full" />
+                      <Input
+                        type="number"
+                        min={1}
+                        {...field}
+                        className="w-full"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="button" variant="default" onClick={onAddMaterial} className="w-full">
+              <Button
+                type="button"
+                variant="default"
+                onClick={onAddMaterial}
+                className="w-full"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Adicionar à lista
               </Button>
@@ -196,7 +287,10 @@ export function AddMaterialButton({ warehouseId }: { warehouseId: Id<"warehouses
             <Separator />
 
             <div className="space-y-4">
-              <MaterialList materialsList={materialsList} onRemove={removeMaterial} />
+              <MaterialList
+                materialsList={materialsList}
+                onRemove={removeMaterial}
+              />
               <Button
                 type="button"
                 variant="outline"

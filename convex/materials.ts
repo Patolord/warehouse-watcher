@@ -130,14 +130,14 @@ export const createMaterial = mutation({
 
     const { name, type, imageFileId, additionalAttributes, monetaryValue } = args;
 
-    // Check for existing material with the same name
+    // Check for existing material with the same name for this user
     const existing = await ctx.db
       .query("materials")
-      .withIndex("by_name", (q) => q.eq("name", name))
+      .withIndex("by_user_and_name", (q) => q.eq("userId", userId).eq("name", name))
       .unique();
 
     if (existing) {
-      throw new ConvexError("Material já existe");
+      throw new ConvexError("Material já existe para este usuário");
     }
 
     const qrCode = nanoid(); // Generate a unique ID for the QR code

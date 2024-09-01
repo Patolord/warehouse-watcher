@@ -1,4 +1,6 @@
 import "./globals.css";
+import FeedbackButton from "@/components/feedback";
+import { Toaster } from "sonner";
 
 export default async function RootLayout({
   children,
@@ -6,8 +8,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html>
-      <body>{children}</body>
+    <html lang="en">
+      <body>
+        {children}
+        <FeedbackButton />
+        <Toaster />
+      </body>
     </html>
   );
 }
