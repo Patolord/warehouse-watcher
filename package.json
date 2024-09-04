@@ -52,7 +52,6 @@
     "lucide-react": "^0.427.0",
     "nanoid": "^5.0.7",
     "next": "14.2.5",
-    "next-intl": "^3.18.1",
     "next-themes": "^0.3.0",
     "nextjs-toploader": "^1.6.12",
     "npm": "^10.8.2",

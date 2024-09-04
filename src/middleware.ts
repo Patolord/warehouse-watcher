@@ -4,50 +4,21 @@ import {
   isAuthenticatedNextjs,
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
-import createIntlMiddleware from "next-intl/middleware";
-import { NextResponse } from "next/server";
 
-const intlMiddleware = createIntlMiddleware({
-  locales: ["en", "pt"],
-  defaultLocale: "en",
-});
+const isSignInPage = createRouteMatcher(["/"]);
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 
-const isLandingPage = createRouteMatcher(["/"]);
-const isProtectedRoute = createRouteMatcher([
-  "/(en|pt)/dashboard(.*)",
-  "/dashboard(.*)",
-]);
-
-export default convexAuthNextjsMiddleware(async (request) => {
-  // Lightweight auth check
-  const isAuthenticated = await isAuthenticatedNextjs();
-
-  // Handle authentication logic
-  if (isLandingPage(request) && isAuthenticated) {
+export default convexAuthNextjsMiddleware((request) => {
+  if (isSignInPage(request) && isAuthenticatedNextjs()) {
     return nextjsMiddlewareRedirect(request, "/dashboard");
   }
-  if (isProtectedRoute(request) && !isAuthenticated) {
+  if (isProtectedRoute(request) && !isAuthenticatedNextjs()) {
     return nextjsMiddlewareRedirect(request, "/");
   }
-
-  // Apply intlMiddleware
-  const response = await intlMiddleware(request);
-
-  // Add auth state to headers for client-side use
-  const finalResponse = response || NextResponse.next();
-  finalResponse.headers.set("x-is-authenticated", String(isAuthenticated));
-
-  return finalResponse;
 });
 
 export const config = {
-  matcher: [
-    // Match all pathnames except for
-    // - API routes
-    // - static assets (i.e., files with extensions)
-    "/((?!.*\\..*|_next).*)",
-    "/(api|trpc)(.*)",
-    // Add the language matcher
-    "/(pt|en)/:path*",
-  ],
+  // The following matcher runs middleware on all routes
+  // except static assets.
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };

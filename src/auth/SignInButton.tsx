@@ -1,22 +1,13 @@
-import React from 'react';
-import { useTranslations } from 'next-intl';
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { SignInDialog } from './SignInDialog';
+import { SignInDialog } from "./SignInDialog";
 
 interface SignInButtonProps {
-    className?: string;
+  className?: string;
 }
 
 export function SignInButton({ className }: SignInButtonProps) {
-    const t = useTranslations('Auth');
-
-    return (
-        <SignInDialog
-            trigger={
-                <Button className={className}>
-                    {t('signIn')}
-                </Button>
-            }
-        />
-    );
+  return (
+    <SignInDialog trigger={<Button className={className}>Sign In</Button>} />
+  );
 }

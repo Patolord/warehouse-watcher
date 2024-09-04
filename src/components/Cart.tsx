@@ -16,7 +16,7 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "./ui/sheet";
-import CartForm from "@/app/[locale]/dashboard/warehouses/[warehouseId]/_components/CartForm";
+
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/table";
 import { getStore } from "@/store/store";
 import { ChangeQtyButtons } from "./ChangeQtyButtons";
+import CartForm from "@/app/dashboard/warehouses/[warehouseId]/_components/CartForm";
 
 export function Cart({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
   const [isOpen, setIsOpen] = useState(false);
