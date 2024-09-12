@@ -4,13 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Package } from "lucide-react";
+import { Package, Warehouse } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { enUS } from "date-fns/locale";
 
-export function RecentActivities() {
-  const activities = useQuery(api.activities.getRecentActivities);
+export interface Activity {
+  id: string;
+  actionType: string;
+  time: string | number;
+  details?: {
+    icon?: "warehouse" | "material";
+  };
+}
 
+export function RecentActivities({ activities }: { activities: any }) {
   return (
     <Card className="col-span-4">
       <CardHeader>
@@ -23,10 +30,16 @@ export function RecentActivities() {
           <p className="text-center text-muted-foreground">No activities</p>
         ) : (
           <ul className="space-y-4">
-            {activities.map((activity) => (
+            {activities.map((activity: Activity) => (
               <li key={activity.id} className="flex items-start space-x-2">
                 <div className="bg-primary rounded-full p-1">
-                  <Package className="h-4 w-4 text-primary-foreground" />
+                  {activity.details?.icon === "warehouse" ? (
+                    <Warehouse className="h-4 w-4 text-primary-foreground" />
+                  ) : activity.details?.icon === "material" ? (
+                    <Package className="h-4 w-4 text-primary-foreground" />
+                  ) : (
+                    <Package className="h-4 w-4 text-primary-foreground" />
+                  )}
                 </div>
                 <div className="flex-1 space-y-1">
                   <p className="text-sm font-medium leading-none">

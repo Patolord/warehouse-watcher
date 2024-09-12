@@ -6,9 +6,7 @@ import { api } from "../../../../convex/_generated/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, Package, Warehouse, ArrowRightLeft } from "lucide-react";
 
-export function StatsCards() {
-  const stats = useQuery(api.dashboard.getStats);
-
+export function StatsCards({ stats }: { stats: any }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatsCard

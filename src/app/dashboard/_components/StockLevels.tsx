@@ -5,9 +5,13 @@ import { useQuery } from "convex/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "../../../../convex/_generated/api";
 
-export function StockLevels() {
-  const stockLevels = useQuery(api.dashboard.getStockLevels);
+interface StockItem {
+  id: string;
+  name: string;
+  quantity: number;
+}
 
+export function StockLevels({ stockLevels }: { stockLevels: any }) {
   return (
     <Card className="col-span-4">
       <CardHeader>
@@ -22,7 +26,7 @@ export function StockLevels() {
           </p>
         ) : (
           <ul>
-            {stockLevels.map((item) => (
+            {stockLevels.map((item: StockItem) => (
               <li key={item.id}>
                 {item.name}: {item.quantity} units
               </li>

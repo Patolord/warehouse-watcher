@@ -21,7 +21,7 @@ export const createActivity = internalMutation({
 
 export const getRecentActivities = query({
     handler: async (ctx) => {
-        const recentActivities = await ctx.db.query("activities").order("desc").take(10)
+        const recentActivities = await ctx.db.query("activities").order("desc").take(5)
         return recentActivities.map(activity => ({
             id: activity._id,
             actionType: activity.actionType,

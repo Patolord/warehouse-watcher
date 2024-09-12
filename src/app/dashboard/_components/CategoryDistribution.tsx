@@ -24,9 +24,7 @@ const COLORS = [
   "hsl(210, 70%, 45%)", // Medium blue
 ];
 
-export function CategoryDistribution() {
-  const distribution = useQuery(api.dashboard.getCategoryDistribution);
-
+export function CategoryDistribution({ distribution }: { distribution: any }) {
   const renderCustomizedLabel = ({
     cx,
     cy,
@@ -86,12 +84,14 @@ export function CategoryDistribution() {
                 labelLine={false}
                 label={renderCustomizedLabel}
               >
-                {distribution.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
+                {distribution.map(
+                  (entry: { name: string; value: number }, index: number) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  )
+                )}
               </Pie>
               <Tooltip
                 contentStyle={{

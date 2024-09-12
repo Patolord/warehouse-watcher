@@ -14,9 +14,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "../../../../convex/_generated/api";
 
-export function InventoryTrends() {
-  const trends = useQuery(api.dashboard.getInventoryTrends);
-
+export function InventoryTrends({ trends }: { trends: any }) {
   return (
     <Card className="col-span-3">
       <CardHeader>
