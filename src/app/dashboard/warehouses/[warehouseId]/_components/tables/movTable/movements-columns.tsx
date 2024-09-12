@@ -56,15 +56,15 @@ type EnrichedTransaction = {
 
 export const columns: ColumnDef<EnrichedTransaction | null>[] = [
   {
-    accessorKey: "Romaneio",
-    header: "Romaneio",
+    accessorKey: "Document",
+    header: "Document",
     cell: ({ row }) => {
       return <Actions movement={row.original} />;
     },
   },
   {
-    accessorKey: "Data",
-    header: "Data",
+    accessorKey: "Date",
+    header: "Date",
     cell: ({ row }) => {
       const formattedDate = milisecondsToDate(row.original!._creationTime);
 
@@ -73,8 +73,8 @@ export const columns: ColumnDef<EnrichedTransaction | null>[] = [
   },
 
   {
-    accessorKey: "Tipo",
-    header: "Tipo",
+    accessorKey: "Type",
+    header: "Type",
     cell: ({ row }) => {
       const type = row.original?.action_type;
 
@@ -90,8 +90,8 @@ export const columns: ColumnDef<EnrichedTransaction | null>[] = [
   },
 
   {
-    accessorKey: "De",
-    header: "De",
+    accessorKey: "From",
+    header: "From",
     cell: ({ row }) => {
       if (!row.original!.fromWarehouseId) {
         return <Package size={22} strokeWidth={1} color="#0011ff" />;
@@ -100,8 +100,8 @@ export const columns: ColumnDef<EnrichedTransaction | null>[] = [
     },
   },
   {
-    accessorKey: "Para",
-    header: "Para",
+    accessorKey: "To",
+    header: "To",
     cell: ({ row }) => {
       if (!row.original!.toWarehouseId) {
         return <PackageOpen color="#0011ff" strokeWidth={1} />;
@@ -130,7 +130,7 @@ export const columns: ColumnDef<EnrichedTransaction | null>[] = [
   },
   {
     accessorKey: "Nome",
-    header: "Nome",
+    header: "Name",
     cell: ({ row }) => {
       const names = row.original!.materials.map((material) => ({
         name: material.materialName,

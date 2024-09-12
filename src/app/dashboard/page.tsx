@@ -10,8 +10,7 @@ export default function Dashboard() {
     <div className="p-6 space-y-6 bg-background">
       <StatsCards />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <InventoryTrends />
-        <RecentActivities />
+        <InventoryTrends /> <RecentActivities />
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <StockLevels />

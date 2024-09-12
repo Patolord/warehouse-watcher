@@ -24,7 +24,7 @@ export default function MaterialCard({
     useShallow((state) => ({
       inventoryItems: state.inventoryItems,
       addMaterial: state.addMaterial,
-    })),
+    }))
   );
 
   return (
@@ -81,7 +81,7 @@ export default function MaterialCard({
               {material.quantity} un.
             </div>
             {inventoryItems.find(
-              (item) => item.materialId === material.materialId,
+              (item) => item.materialId === material.materialId
             ) ? (
               <ChangeQtyButtons
                 inventoryItemId={material.materialId}
@@ -93,7 +93,7 @@ export default function MaterialCard({
                   variant="secondary"
                   onClick={() => addMaterial(material)}
                 >
-                  Transferir
+                  Transfer
                 </Button>
                 <div className="h-[40px] w-[20px]"></div>
               </div>

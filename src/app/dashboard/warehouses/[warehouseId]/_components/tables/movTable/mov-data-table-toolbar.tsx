@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Table } from "@tanstack/react-table";
 
 import { DataTableFacetedFilter } from "./mov-data-table-fac-filter";
@@ -12,16 +11,16 @@ interface DataTableToolbarProps<TData> {
 
 export const types = [
   {
-    label: "Novo",
-    value: "Novo",
+    label: "Added",
+    value: "added",
   },
   {
-    label: "Removido",
-    value: "Removido",
+    label: "Removed",
+    value: "removed",
   },
   {
-    label: "Transferência",
-    value: "Transferência",
+    label: "Transfered",
+    value: "transfered",
   },
 ];
 
@@ -33,10 +32,10 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex gap-8 items-center justify-around">
       <div className="flex flex-1 items-center space-x-2">
-        {table.getColumn("Tipo") && (
+        {table.getColumn("Type") && (
           <DataTableFacetedFilter
-            column={table.getColumn("Tipo")}
-            title="Tipo"
+            column={table.getColumn("Type")}
+            title="Type"
             options={types}
           />
         )}
@@ -79,7 +78,6 @@ export function DataTableToolbar<TData>({
           </DropdownMenuContent>
         </DropdownMenu> */}
       </div>
-
     </div>
   );
 }

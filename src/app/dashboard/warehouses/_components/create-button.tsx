@@ -56,8 +56,8 @@ export function CreateButton() {
     defaultValues: {
       name: "",
       address: "",
-      latitude: -23.5505, // São Paulo coordinates as default
-      longitude: -46.6333,
+      latitude: 37.7749, // San Francisco coordinates as default
+      longitude: -122.4194,
     },
   });
 

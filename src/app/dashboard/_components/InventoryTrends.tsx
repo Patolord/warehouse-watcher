@@ -18,7 +18,7 @@ export function InventoryTrends() {
   const trends = useQuery(api.dashboard.getInventoryTrends);
 
   return (
-    <Card className="col-span-4">
+    <Card className="col-span-3">
       <CardHeader>
         <CardTitle>Inventory Trends</CardTitle>
       </CardHeader>

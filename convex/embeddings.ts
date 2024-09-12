@@ -10,6 +10,7 @@ import {
 import OpenAI from "openai";
 import { api, internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
+import { auth } from "./auth";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -95,7 +96,7 @@ export const createEmbedding = internalAction({
 
 export const searchSimilar = query({
   args: {
-    userId: v.string(),
+    userId: v.id("users"),
     query: v.string(),
     sourceType: v.optional(
       v.union(
@@ -123,7 +124,7 @@ export const searchSimilar = query({
     // Here we would normally compute the embedding for the query
     // and compare it with the stored embeddings.
     // For this example, we'll just return the first 5 embeddings.
-    const results = embeddings.slice(0, 5).map((embedding) => ({
+    const results = embeddings.map((embedding) => ({
       sourceId: embedding.sourceId,
       sourceType: embedding.sourceType,
       textContent: embedding.textContent,
@@ -148,12 +149,7 @@ export async function getUserId(ctx: ContextWithAuth): Promise<string> {
   return identity.subject;
 }
 
-function cosineSimilarity(vec1: number[], vec2: number[]): number {
-  const dotProduct = vec1.reduce((sum, val, i) => sum + val * vec2[i], 0);
-  const magnitude1 = Math.sqrt(vec1.reduce((sum, val) => sum + val * val, 0));
-  const magnitude2 = Math.sqrt(vec2.reduce((sum, val) => sum + val * val, 0));
-  return dotProduct / (magnitude1 * magnitude2);
-}
+
 
 // Helper function to generate text for embedding
 export function generateEmbeddingText(
@@ -190,8 +186,11 @@ export const chatWithContext = action({
       sourceType?: "material" | "warehouse" | "transaction";
     }
   ): Promise<string> => {
-    const userId = await getUserId(ctx);
+    const userId = await auth.getUserId(ctx);
 
+    if (!userId) {
+      throw new ConvexError("User not authenticated");
+    }
     try {
       // Search for similar items
       const similarItems = (await ctx.runQuery(api.embeddings.searchSimilar, {
@@ -212,7 +211,7 @@ export const chatWithContext = action({
           {
             role: "system",
             content:
-              "You are a helpful assistant with knowledge about our inventory system.",
+              "You are an AI assistant with knowledge about our inventory system.",
           },
           {
             role: "user",

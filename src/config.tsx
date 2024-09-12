@@ -18,14 +18,14 @@ export const NavItems = () => {
     },
 
     {
-      name: "Estoques",
+      name: "Warehouses",
       href: "/dashboard/warehouses",
       icon: <Warehouse size={20} />,
       active: isNavItemActive(pathname, "warehouses"),
       position: "top",
     },
     {
-      name: "Materiais",
+      name: "Materials",
       href: "/dashboard/materials",
       icon: <Boxes size={20} />,
       active: isNavItemActive(pathname, "materials"),

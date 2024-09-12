@@ -45,7 +45,7 @@ export default function FeedbackButton() {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 640px)");
   const description =
-    "Valorizamos seu feedback. Como podemos melhorar sua experiência?";
+    "We value your feedback. How can we improve your experience?";
 
   if (!isDesktop) {
     return (
@@ -64,7 +64,7 @@ export default function FeedbackButton() {
             <FeedbackForm setOpen={setOpen} />
             <DrawerFooter className="pt-2">
               <DrawerClose asChild>
-                <Button variant="outline">Cancelar</Button>
+                <Button variant="outline">Cancel</Button>
               </DrawerClose>
             </DrawerFooter>
           </DrawerContent>
@@ -132,13 +132,13 @@ export function FeedbackForm({ setOpen }: FeedbackFormProps) {
     >
       <div className="grid gap-2">
         <Label htmlFor="name">
-          Seu nome <span className="text-red-600">*</span>
+          Your name <span className="text-red-600">*</span>
         </Label>
         <Controller
           name="name"
           control={control}
           render={({ field }) => (
-            <Input {...field} type="name" id="name" placeholder="João Silva" />
+            <Input {...field} type="name" id="name" placeholder="John Doe" />
           )}
         />
         {errors.name && typeof errors.name.message === "string" && (
@@ -147,7 +147,7 @@ export function FeedbackForm({ setOpen }: FeedbackFormProps) {
       </div>
       <div className="grid gap-2">
         <Label htmlFor="feedback">
-          Seu feedback <span className="text-red-600">*</span>
+          Your feedback <span className="text-red-600">*</span>
         </Label>
         <Controller
           name="feedback"
@@ -156,7 +156,7 @@ export function FeedbackForm({ setOpen }: FeedbackFormProps) {
             <textarea
               {...field}
               className="w-full h-32 text-sm border rounded-lg flex border-input bg-background px-3 py-2 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="Escreva como podemos melhorar a sua experiência."
+              placeholder="Write how we can improve your experience."
             />
           )}
         />
@@ -172,7 +172,7 @@ export function FeedbackForm({ setOpen }: FeedbackFormProps) {
               Sending feedback...
             </>
           ) : (
-            "Enviar feedback"
+            "Send feedback"
           )}
         </Button>
       </div>

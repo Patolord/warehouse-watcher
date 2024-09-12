@@ -44,7 +44,7 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between gap-2">
       <div className="flex items-center py-4 gap-2">
         <Input
-          placeholder="Filtrar materiais..."
+          placeholder="Filter materials..."
           value={
             (table.getColumn("materialName")?.getFilterValue() as string) ?? ""
           }

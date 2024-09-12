@@ -86,3 +86,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Add this to your global CSS file */
+.prose {
+  max-width: 65ch;
+
+  line-height: 1.6;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  color: #111827;
+  font-weight: 600;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}

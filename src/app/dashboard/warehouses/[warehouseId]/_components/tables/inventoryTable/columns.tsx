@@ -25,7 +25,7 @@ interface InventoryList {
 export const columns: ColumnDef<InventoryList | null>[] = [
   {
     accessorKey: "materialName",
-    header: "Nome",
+    header: "Name",
     cell: ({ row }) => {
       const material = row.original;
       if (!material) return <div>N/A</div>; // Handling null or undefined rows
@@ -73,11 +73,11 @@ export const columns: ColumnDef<InventoryList | null>[] = [
   },
   {
     accessorKey: "quantity",
-    header: "Quantidade",
+    header: "Quantity",
   },
   {
     accessorKey: "materialType",
-    header: "Tipo",
+    header: "Type",
     cell: ({ row }) => {
       const typeValue = String(row.getValue("materialType"));
       const priority = types.find(
@@ -96,7 +96,7 @@ export const columns: ColumnDef<InventoryList | null>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Ações",
+    header: "Actions",
     cell: ({ row }) => {
       const warehouseId = row.original!.warehouseId;
       return <Actions inventory={row.original!} warehouseId={warehouseId} />;

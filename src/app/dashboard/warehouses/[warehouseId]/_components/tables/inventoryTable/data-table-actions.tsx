@@ -33,7 +33,7 @@ export default function Actions({
       ) : (
         <div className="flex items-center">
           <Button variant="secondary" onClick={() => addMaterial(inventory)}>
-            Transferir
+            Transfer
           </Button>
 
           <div className="h-[40px] w-[40px]"></div>

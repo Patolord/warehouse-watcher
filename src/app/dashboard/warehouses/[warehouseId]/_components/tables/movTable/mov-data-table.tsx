@@ -36,7 +36,7 @@ export function MovDataTable<TData, TValue>({
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+    []
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({
@@ -80,9 +80,9 @@ export function MovDataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}
@@ -100,7 +100,7 @@ export function MovDataTable<TData, TValue>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(),
+                        cell.getContext()
                       )}
                     </TableCell>
                   ))}
@@ -112,7 +112,7 @@ export function MovDataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Nenhum resultado.
+                  No results.
                 </TableCell>
               </TableRow>
             )}

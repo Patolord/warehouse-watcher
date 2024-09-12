@@ -78,10 +78,10 @@ export function Cart({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
       <SheetContent className="w-screen sm:w-[500px] sm:max-w-none">
         <SheetHeader>
           <div className="flex flex-col gap-2 text-lg justify-center items-center">
-            <h1>Romaneio</h1>
+            <h1>Bill of Materials</h1>
             {inventoryItems.length > 0 ? (
               <Button onClick={reset} variant="secondary" size="sm">
-                Limpar
+                Clear
               </Button>
             ) : null}
           </div>
@@ -93,12 +93,12 @@ export function Cart({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="hidden w-[100px] sm:table-cell">
-                      Imagem
-                      <span className="sr-only">Imagem</span>
+                      Image
+                      <span className="sr-only">Image</span>
                     </TableHead>
-                    <TableHead>Nome</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead className="hidden sm:table-cell">
-                      Quantidade
+                      Quantity
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -121,7 +121,7 @@ export function Cart({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
                       <TableCell className="font-medium">
                         {item.materialName}
                         <div className="font-light">
-                          Em estoque: {item.quantity}
+                          In stock: {item.quantity}
                         </div>
                       </TableCell>
 
@@ -137,7 +137,7 @@ export function Cart({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
               </Table>
             </ScrollArea>
           ) : (
-            <p className="flex pt-10 justify-center">Nenhum item adicionado</p>
+            <p className="flex pt-10 justify-center">No items added</p>
           )}
         </div>
 
@@ -167,7 +167,7 @@ export function Cart({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
                       <h3 className="font-medium text-sm">
                         {item.materialName}
                       </h3>
-                      <p className="text-sm">Em Estoque: {item.cartQuantity}</p>
+                      <p className="text-sm">In stock: {item.cartQuantity}</p>
                     </div>
                   </div>
                   <div>
@@ -179,9 +179,7 @@ export function Cart({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
                 </div>
               ))
             ) : (
-              <p className="flex pt-10 justify-center">
-                Nenhum item adicionado
-              </p>
+              <p className="flex pt-10 justify-center">No items added</p>
             )}
           </ScrollArea>
         </div>

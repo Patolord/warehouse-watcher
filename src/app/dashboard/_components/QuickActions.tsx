@@ -10,7 +10,7 @@ export function QuickActions() {
       <CardHeader>
         <CardTitle>Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="flex gap-2">
         <CreateMaterialButton variantText="default" />
         <CreateWarehouseButton />
       </CardContent>

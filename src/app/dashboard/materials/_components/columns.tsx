@@ -23,7 +23,7 @@ export const columns: ColumnDef<Doc<"materials"> & { url: string | null }>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Nome
+          Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -74,7 +74,7 @@ export const columns: ColumnDef<Doc<"materials"> & { url: string | null }>[] = [
   },
   {
     accessorKey: "type",
-    header: "Tipo",
+    header: "Type",
     cell: ({ row }) => {
       const typeValue = String(row.getValue("type"));
       const priority = types.find(
@@ -93,7 +93,7 @@ export const columns: ColumnDef<Doc<"materials"> & { url: string | null }>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Ações",
+    header: "Actions",
     cell: ({ row }) => {
       return <Actions material={row.original} />;
     },

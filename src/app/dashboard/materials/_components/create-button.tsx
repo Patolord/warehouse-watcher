@@ -118,7 +118,7 @@ export function CreateButton({ variantText }: CreateButtonProps) {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome" {...field} />
+                      <Input placeholder="Name" {...field} />
                     </FormControl>
 
                     <FormMessage />
@@ -135,7 +135,7 @@ export function CreateButton({ variantText }: CreateButtonProps) {
                     <FormControl>
                       <>
                         <Input
-                          placeholder="Copper, Grid, Cable, etc."
+                          placeholder="Bag, T-Shirt, Cable, etc."
                           list="material-types"
                           {...field}
                         />
