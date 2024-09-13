@@ -26,7 +26,7 @@ export default function WarehouseCard({
       <CardFooter>
         <Button variant="secondary" asChild className="flex items-center gap-2">
           <Link href={`/dashboard/warehouses/${warehouse._id}`}>
-            Ver Estoque <ArrowBigRight />
+            View Inventory <ArrowBigRight />
           </Link>
         </Button>
       </CardFooter>
