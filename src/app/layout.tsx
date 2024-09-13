@@ -32,20 +32,14 @@ export default async function RootLayout({
         <body className={`${inter.className}`}>
           <ConvexClientProvider>
             <NextTopLoader />
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="light"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <Header />
-              {children}
-              <FeedbackButton />
 
-              <Toaster />
+            <Header />
+            {children}
+            <FeedbackButton />
 
-              <TailwindIndicator />
-            </ThemeProvider>
+            <Toaster />
+
+            <TailwindIndicator />
           </ConvexClientProvider>
         </body>
       </html>

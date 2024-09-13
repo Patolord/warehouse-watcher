@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "convex/react";
 
 import {
   LineChart,
@@ -12,7 +11,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api } from "../../../../convex/_generated/api";
 
 export function InventoryTrends({ trends }: { trends: any }) {
   return (
@@ -30,10 +28,22 @@ export function InventoryTrends({ trends }: { trends: any }) {
         ) : (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trends}>
-              <XAxis dataKey="date" />
-              <YAxis />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                axisLine={false}
+                tickLine={false}
+                tickMargin={10}
+              />
+              <YAxis axisLine={false} tickLine={false} tickMargin={10} />
               <Tooltip />
-              <Line type="monotone" dataKey="count" stroke="#8884d8" />
+              <Line
+                type="monotone"
+                dataKey="count"
+                stroke="hsl(var(--primary))"
+                strokeWidth={2}
+                dot={false}
+              />
             </LineChart>
           </ResponsiveContainer>
         )}
