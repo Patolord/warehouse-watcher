@@ -1,7 +1,6 @@
 "use client";
 
 import { useConvexAuth } from "convex/react";
-import { redirect } from "next/navigation";
 import SideNav from "./side-nav";
 import { Loader2 } from "lucide-react";
 
@@ -10,7 +9,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, isLoading } = useConvexAuth();
+  const { isLoading } = useConvexAuth();
 
   if (isLoading) {
     return (
@@ -18,10 +17,6 @@ export default function DashboardLayout({
         <Loader2 className="h-12 w-12 animate-spin" />
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return redirect("/");
   }
 
   return (
