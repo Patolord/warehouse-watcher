@@ -5,7 +5,6 @@ import { mutation, query } from "./_generated/server";
 import { queryTransactionsContainingMaterial } from "./transactions";
 import { auth } from "./auth";
 import { internal } from "./_generated/api";
-import { getUserId } from "./embeddings";
 import { nanoid } from 'nanoid';
 
 //queries

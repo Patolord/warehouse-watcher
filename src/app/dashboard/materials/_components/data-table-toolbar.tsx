@@ -25,13 +25,7 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
-  const types2 = useQuery(api.materials.getUniqueMaterialTypesByUser);
-
-  const isLoading = !types2;
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const types = useQuery(api.materials.getUniqueMaterialTypesByUser);
 
   return (
     <div className="flex items-center justify-between gap-2">
@@ -50,7 +44,7 @@ export function DataTableToolbar<TData>({
           <DataTableFacetedFilter
             column={table.getColumn("type")}
             title="Type"
-            options={types2}
+            options={types || []}
           />
         )}
         {isFiltered && (
