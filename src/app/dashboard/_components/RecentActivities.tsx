@@ -30,13 +30,25 @@ export function RecentActivities({ activities }: { activities: any }) {
           <ul className="space-y-4">
             {activities.map((activity: Activity) => (
               <li key={activity.id} className="flex items-start space-x-2">
-                <div className="bg-primary rounded-full p-1">
+                <div className="bg-primary rounded-full p-1 items-center">
                   {activity.details?.icon === "warehouse" ? (
-                    <Warehouse className="h-4 w-4 text-primary-foreground" />
+                    <Warehouse
+                      className="text-primary-foreground"
+                      size={16}
+                      strokeWidth={1.5}
+                    />
                   ) : activity.details?.icon === "material" ? (
-                    <Package className="h-4 w-4 text-primary-foreground" />
+                    <Package
+                      className="text-primary-foreground"
+                      size={16}
+                      strokeWidth={1.5}
+                    />
                   ) : (
-                    <Package className="h-4 w-4 text-primary-foreground" />
+                    <Package
+                      className="text-primary-foreground"
+                      size={16}
+                      strokeWidth={1.5}
+                    />
                   )}
                 </div>
                 <div className="flex-1 space-y-1">

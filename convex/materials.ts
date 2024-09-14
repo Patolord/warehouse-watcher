@@ -156,7 +156,7 @@ export const createMaterial = mutation({
 
     // Create an activity for the material creation
     await ctx.scheduler.runAfter(0, internal.activities.createActivity, {
-      actionType: `Material ${name} created`,
+      actionType: `Material ${name} created.`,
       time: new Date().toISOString(),
       details: { materialId, materialName: name, icon: "material", },
     });

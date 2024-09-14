@@ -27,7 +27,7 @@ export const createWarehouse = mutation({
 
     // Create an activity for the warehouse creation using the provided message
     await ctx.scheduler.runAfter(0, internal.activities.createActivity, {
-      actionType: `Warehouse ${args.name} created`,
+      actionType: `Warehouse ${args.name} created.`,
       time: new Date().toISOString(),
       details: {
         icon: "warehouse",

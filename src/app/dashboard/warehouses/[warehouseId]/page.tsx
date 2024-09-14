@@ -19,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { api } from "../../../../../convex/_generated/api";
+import { Separator } from "@/components/ui/separator";
 
 export default function WarehousePage({
   params,
@@ -91,9 +92,10 @@ export default function WarehousePage({
               </Link>
             </Button>
             <h3 className="text-xl">
-              Materials in &quot;{currentWarehouse?.name}&quot;
+              {currentWarehouse?.name} Inventory and Transactions
             </h3>
           </div>
+
           <Button asChild variant="outline" size="sm">
             <Link href={mapLink}>
               <MapPin size={16} className="mr-2" />
@@ -101,6 +103,7 @@ export default function WarehousePage({
             </Link>
           </Button>
         </div>
+        <Separator />
         <Image
           src="/logistics.svg"
           alt="Warehouse"
@@ -112,7 +115,7 @@ export default function WarehousePage({
         <Tabs defaultValue="inventory">
           <TabsList>
             <TabsTrigger value="inventory">Inventory</TabsTrigger>
-            <TabsTrigger value="movements">Movements</TabsTrigger>
+            <TabsTrigger value="transactions">Transactions</TabsTrigger>
           </TabsList>
           <TabsContent value="inventory">
             <h2 className="mt-10 flex gap-4">
@@ -125,8 +128,8 @@ export default function WarehousePage({
               <DataTable columns={columns} data={inventory || []} />
             </div>
           </TabsContent>
-          <TabsContent value="movements">
-            <h3 className="text-xl mb-3 mt-28">Movements</h3>
+          <TabsContent value="transactions">
+            <h3 className="text-xl mb-3 mt-28">Transactions</h3>
 
             <div>
               <MovDataTable

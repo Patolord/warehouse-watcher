@@ -19,7 +19,7 @@ import { Clipboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { milisecondsToDate } from "@/lib/utils";
 import { api } from "../../../../../../convex/_generated/api";
-import { Doc, Id } from "../../../../../../convex/_generated/dataModel";
+import { Id } from "../../../../../../convex/_generated/dataModel";
 
 type EnrichedTransaction = {
   _creationTime: number;
@@ -205,7 +205,7 @@ export default function GenerateDocument({
               width: { size: 100, type: WidthType.PERCENTAGE },
             }),
             new Paragraph({
-              text: "Declaro ter recebido os materiais descritos acima.",
+              text: "I hereby declare that I have received the materials described above.",
               spacing: { before: 400, after: 800 },
             }),
             new Table({
