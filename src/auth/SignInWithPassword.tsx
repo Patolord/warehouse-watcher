@@ -23,7 +23,6 @@ export function SignInWithPassword({
 }: SignInWithPasswordProps) {
   const { signIn } = useAuthActions();
   const [flow, setFlow] = useState<"signIn" | "signUp">("signIn");
-  const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
   const [errors, setErrors] = useState<z.ZodIssue[]>([]);
@@ -44,37 +43,14 @@ export function SignInWithPassword({
       onSuccess(formValues.email as string);
       router.push("/dashboard");
     } catch (error) {
-      console.error(error);
       if (error instanceof z.ZodError) {
-        setErrors(error.issues);
+        setErrors(error.errors);
       } else if (error instanceof Error) {
-        // Handle various error scenarios
-        if (
-          error.message.includes("Unexpected token") ||
-          error.message.includes("Internal Server Error")
-        ) {
-          setAuthError("Server error. Please try again later.");
-        } else if (
-          error.message.includes("Invalid email or password") ||
-          error.message.includes("ConvexError: Invalid credentials")
-        ) {
-          setAuthError("Incorrect email or password. Please try again.");
-        } else {
-          setAuthError("An unknown error occurred. Please try again.");
-        }
-
-        toast({
-          title: "Sign In Error",
-          description: authError || "An unknown error occurred",
-          variant: "destructive",
-        });
+        setAuthError("Invalid account or password");
       } else {
-        setAuthError("An unknown error occurred. Please try again.");
-        toast({
-          title: "Sign In Error",
-          description: "An unknown error occurred",
-          variant: "destructive",
-        });
+        setAuthError(
+          "An unexpected error occurred. Please try again or contact support."
+        );
       }
     } finally {
       setSubmitting(false);
