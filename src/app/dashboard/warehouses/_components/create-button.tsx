@@ -121,17 +121,16 @@ export function CreateButton() {
       <DialogTrigger asChild>
         <Button>Add Warehouse</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Warehouse</DialogTitle>
           <DialogDescription>
-            Enter the warehouse name and address, and click &quot;Update
-            Map&quot; to adjust the location.
+            Enter the warehouse details and adjust the location on the map.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="grid gap-4 py-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid gap-3">
               <FormField
                 control={form.control}
                 name="name"
@@ -182,11 +181,13 @@ export function CreateButton() {
               <FormItem>
                 <FormLabel>Location</FormLabel>
                 <FormControl>
-                  <MapSelector
-                    latitude={form.watch("latitude")}
-                    longitude={form.watch("longitude")}
-                    onLocationChange={handleLocationChange}
-                  />
+                  <div className="h-[200px] sm:h-[300px]">
+                    <MapSelector
+                      latitude={form.watch("latitude")}
+                      longitude={form.watch("longitude")}
+                      onLocationChange={handleLocationChange}
+                    />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

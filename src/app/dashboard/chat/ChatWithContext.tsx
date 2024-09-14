@@ -57,10 +57,12 @@ export default function ChatWithContextComponent() {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-3xl h-[calc(100vh-2rem)] flex flex-col">
+    <div className="container mx-auto p-4 max-w-3xl h-[calc(100vh-2rem-72px)] flex flex-col">
       <Card className="flex-grow flex flex-col overflow-hidden">
         <CardContent className="flex-grow flex flex-col p-6 overflow-hidden">
-          <h1 className="text-3xl font-bold mb-6">Chat with Context</h1>
+          <h1 className="text-3xl font-bold mb-6">
+            Chat with Warehouse Manager AI
+          </h1>
           <div className="flex-grow overflow-y-auto mb-4 pr-4">
             {messages.map((message, index) => (
               <div
