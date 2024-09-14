@@ -8,7 +8,7 @@ import remarkGfm from "remark-gfm";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, HelpCircle } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -56,8 +56,41 @@ export default function ChatWithContextComponent() {
     }
   };
 
+  const exampleQuestions = [
+    "What's the current inventory of Product X?",
+    "When is the next shipment of Product Y expected?",
+    "How many units of Product Z were sold last month?",
+    "What's the storage location for Product W?",
+  ];
+
   return (
     <div className="container mx-auto p-4 max-w-3xl h-[calc(100vh-2rem-72px)] flex flex-col">
+      <Card className="mb-4">
+        <CardContent className="p-6">
+          <h2 className="text-2xl font-bold mb-4 flex items-center">
+            <HelpCircle className="mr-2" /> How to Use the Warehouse Manager AI
+          </h2>
+          <p className="mb-4">
+            Welcome to the Warehouse Manager AI! This chat interface allows you
+            to ask questions about inventory, shipments, sales, and product
+            locations. Simply type your question in the chat box below and press
+            'Send' or hit Enter.
+          </p>
+          <h3 className="text-xl font-semibold mb-2">Example Questions:</h3>
+          <ul className="list-disc pl-5 space-y-2">
+            {exampleQuestions.map((question, index) => (
+              <li
+                key={index}
+                className="cursor-pointer hover:text-primary"
+                onClick={() => setQuery(question)}
+              >
+                {question}
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+
       <Card className="flex-grow flex flex-col overflow-hidden">
         <CardContent className="flex-grow flex flex-col p-6 overflow-hidden">
           <h1 className="text-3xl font-bold mb-6">
@@ -74,7 +107,7 @@ export default function ChatWithContextComponent() {
                 <div
                   className={`inline-block p-3 rounded-lg ${
                     message.role === "user"
-                      ? "bg-primary text-white"
+                      ? "bg-primary text-primary-foreground"
                       : "bg-muted"
                   }`}
                 >
