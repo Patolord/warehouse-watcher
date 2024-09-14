@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateButton as CreateMaterialButton } from "../materials/_components/create-button";
 import { CreateButton as CreateWarehouseButton } from "../warehouses/_components/create-button";
+import { Button } from "@/components/ui/button";
 
 export function QuickActions() {
   return (
@@ -11,8 +12,12 @@ export function QuickActions() {
         <CardTitle>Quick Actions</CardTitle>
       </CardHeader>
       <CardContent className="flex gap-2">
-        <CreateMaterialButton variantText="default" />
-        <CreateWarehouseButton />
+        <CreateMaterialButton
+          triggerButton={<Button className="">Create Material</Button>}
+        />
+        <CreateWarehouseButton
+          triggerButton={<Button className="">Add Warehouse</Button>}
+        />
       </CardContent>
     </Card>
   );

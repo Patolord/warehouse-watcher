@@ -201,21 +201,21 @@ const WorldMap: React.FC<WorldMapProps> = ({
             <div className="flex items-center mb-1">
               <WarehouseIcon color="#4CAF50" size={16} className="mr-2" />
               <span className="text-sm">
-                User Warehouse:{" "}
+                Your Warehouses:{" "}
                 <span className="font-semibold">{userWarehouses.length}</span>
               </span>
             </div>
             <div className="flex items-center mb-1">
               <WarehouseIcon color="#FF5722" size={16} className="mr-2" />
               <span className="text-sm">
-                Other Warehouse:{" "}
+                Users Warehouses:{" "}
                 <span className="font-semibold">{otherWarehouses.length}</span>
               </span>
             </div>
             <div className="flex items-center">
               <CircleDot color="#3388ff" size={16} className="mr-2" />
               <span className="text-sm">
-                Transaction:{" "}
+                Your Transactions:{" "}
                 <span className="font-semibold">{transactions.length}</span>
               </span>
             </div>

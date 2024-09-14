@@ -41,19 +41,11 @@ const formSchema = z.object({
   }),
 });
 
-interface CreateButtonProps {
-  variantText:
-    | "link"
-    | "default"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | null
-    | undefined;
-}
-
-export function CreateButton({ variantText }: CreateButtonProps) {
+export function CreateButton({
+  triggerButton,
+}: {
+  triggerButton: React.ReactNode;
+}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // 1. Define your form.
@@ -98,9 +90,7 @@ export function CreateButton({ variantText }: CreateButtonProps) {
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
-        <Button variant={variantText}>New Material</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{triggerButton}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>New Material</DialogTitle>

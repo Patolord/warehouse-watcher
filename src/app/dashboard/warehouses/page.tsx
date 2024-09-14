@@ -1,8 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { Loader2 } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { columns } from "./_components/columns";
 import { CreateButton } from "./_components/create-button";
 import { DataTable } from "./_components/data-table";
@@ -10,6 +9,7 @@ import WarehouseCard from "./_components/warehouse-card";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { api } from "../../../../convex/_generated/api";
 import { useWarehousesStore } from "@/store/warehousesStore";
+import { Button } from "@/components/ui/button";
 
 export default function WarehousesPage() {
   const { warehouses, setWarehouses, isLoading, setIsLoading } =
@@ -26,9 +26,16 @@ export default function WarehousesPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mx-10 mb-4">
         <h1 className="text-lg font-semibold md:text-2xl">Warehouses</h1>
-        <CreateButton />
+
+        <CreateButton
+          triggerButton={
+            <Button className="bg-blue-700 hover:bg-blue-500">
+              Add Warehouse
+            </Button>
+          }
+        />
       </div>
       {isDesktop ? (
         <div className="container mx-auto ">

@@ -154,7 +154,7 @@ export function AddMaterialButton({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button className="w-full sm:w-auto">
+        <Button className="w-full sm:w-auto bg-blue-700 hover:bg-blue-500">
           <Plus className="mr-2 h-4 w-4" />
           Add Material
         </Button>

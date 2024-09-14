@@ -77,7 +77,7 @@ const WarehousePage: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col p-4 space-y-4">
-      <h1 className="text-3xl font-bold">
+      <h1 className="text-xl font-bold">
         Warehouse Locations and Transactions
       </h1>
       <div className="flex-1 flex">

@@ -27,9 +27,8 @@ const WarehouseDetails: React.FC<WarehouseDetailsProps> = ({
             <strong>Address:</strong> {warehouse.address}
           </p>
         )}
-        <p className="mb-2">
-          <strong>Coordinates:</strong> {warehouse.latitude},{" "}
-          {warehouse.longitude}
+        <p className="mb-2 text-xs text-gray-500">
+          Coordinates: {warehouse.latitude}, {warehouse.longitude}
         </p>
         <p className="mb-2">
           <strong>Created:</strong>{" "}

@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "convex/react";
 
 import {
   PieChart,
@@ -12,7 +11,6 @@ import {
   Tooltip,
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api } from "../../../../convex/_generated/api";
 
 // Updated color scheme with blue tones
 const COLORS = [

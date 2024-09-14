@@ -57,10 +57,10 @@ export default function ChatWithContextComponent() {
   };
 
   const exampleQuestions = [
-    "What&apos;s the current inventory of Product X?",
-    "When is the next shipment of Product Y expected?",
-    "How many units of Product Z were sold last month?",
-    "What&apos;s the storage location for Product W?",
+    "What's the current inventory of Product X?",
+    "What's the storage location for Product Y?",
+    "How many of Product Z were transfered?",
+    "What's the current inventory of Warehouse A?",
   ];
 
   return (

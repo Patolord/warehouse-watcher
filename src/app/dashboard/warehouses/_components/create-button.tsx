@@ -46,7 +46,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function CreateButton() {
+export function CreateButton({
+  triggerButton,
+}: {
+  triggerButton: React.ReactNode;
+}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [addressNotFound, setAddressNotFound] = useState(false);
@@ -118,9 +122,7 @@ export function CreateButton() {
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
-        <Button>Add Warehouse</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{triggerButton}</DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Warehouse</DialogTitle>

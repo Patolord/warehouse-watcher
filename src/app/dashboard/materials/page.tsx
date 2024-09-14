@@ -12,6 +12,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { types } from "./_components/data-table-toolbar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMaterialsStore } from "@/store/materialsStore";
+import { Button } from "@/components/ui/button";
 
 export default function MaterialsPage() {
   const { isAuthenticated } = useConvexAuth();
@@ -59,11 +60,17 @@ export default function MaterialsPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mx-10 mb-4">
         <h1 className="text-lg font-semibold md:text-2xl">
           Registered Materials
         </h1>
-        <CreateButton variantText="default" />
+        <CreateButton
+          triggerButton={
+            <Button className="bg-blue-700 hover:bg-blue-500">
+              Create Material
+            </Button>
+          }
+        />
       </div>
       {!isDesktop && (
         <SearchFilterControls

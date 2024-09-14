@@ -20,27 +20,6 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { api } from "../../../../../convex/_generated/api";
 
-type EnrichedTransaction = {
-  _creationTime: number;
-  _id: Id<"transactions">;
-  from_location?: Id<"warehouses">;
-  to_location?: Id<"warehouses">;
-  action_type: string;
-  materials: {
-    materialId: Id<"materials">;
-    materialVersionId: Id<"materialVersions">;
-    quantity: number;
-    materialName: string;
-    materialType: string | undefined;
-    materialImageFileId: Id<"_storage"> | undefined;
-    versionNumber: number;
-    versionCreationTime: number;
-  }[];
-  fromWarehouseId?: Id<"warehouses">;
-  toWarehouseId?: Id<"warehouses">;
-  description?: string;
-};
-
 export default function WarehousePage({
   params,
 }: {
@@ -51,11 +30,6 @@ export default function WarehousePage({
   const currentWarehouse = useQuery(api.warehouses.getWarehouseById, {
     warehouseId: params.warehouseId,
   });
-
-  const uniqueMaterialTypes = useQuery(
-    api.materials.getUniqueMaterialTypesByUser,
-    {}
-  );
 
   //query inventory information
   const inventory = useQuery(
@@ -148,11 +122,7 @@ export default function WarehousePage({
             </h2>
 
             <div>
-              {inventory && inventory.length > 0 ? (
-                <DataTable columns={columns} data={inventory} />
-              ) : (
-                <div>No materials registered.</div>
-              )}
+              <DataTable columns={columns} data={inventory || []} />
             </div>
           </TabsContent>
           <TabsContent value="movements">

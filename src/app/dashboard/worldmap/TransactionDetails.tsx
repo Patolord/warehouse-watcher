@@ -45,7 +45,9 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
               {new Date(transaction._creationTime).toLocaleString()}
             </p>
             <Button asChild className="mt-2">
-              <Link href={`/dashboard/transactions/${transaction._id}`}>
+              <Link
+                href={`/dashboard/warehouses/${transaction.to_warehouse?._id}`}
+              >
                 View Transaction Details
               </Link>
             </Button>
