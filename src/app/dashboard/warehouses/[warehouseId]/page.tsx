@@ -4,7 +4,7 @@ import { useQuery } from "convex/react";
 import { ArrowBigLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { MapPin } from "lucide-react"; // Add this import
 
 import MaterialCard from "./_components/InventoryCard";
@@ -58,14 +58,20 @@ export default function WarehousePage({
   );
 
   //query inventory information
-
-  //query inventory information
   const inventory = useQuery(
     api.inventories.getInventoryForDisplayByWarehouseId,
     {
       warehouseId: params.warehouseId,
     }
   );
+
+  const inventoryMaterialTypes = useMemo(() => {
+    if (!inventory) return [];
+    const types = new Set(
+      inventory.map((item) => item?.materialType).filter(Boolean)
+    );
+    return Array.from(types).map((type) => ({ value: type, label: type }));
+  }, [inventory]);
 
   const transactions = useQuery(
     api.transactions.getTransactionsForDisplayByWarehouseId,
@@ -215,8 +221,8 @@ export default function WarehousePage({
                 value={selectedType}
               >
                 <option value="all">All Types</option>
-                {uniqueMaterialTypes &&
-                  uniqueMaterialTypes.map((type) => (
+                {inventoryMaterialTypes &&
+                  inventoryMaterialTypes.map((type) => (
                     <option key={type.value} value={type.value}>
                       {type.label}
                     </option>
