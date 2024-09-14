@@ -57,10 +57,10 @@ export default function ChatWithContextComponent() {
   };
 
   const exampleQuestions = [
-    "What's the current inventory of Product X?",
+    "What&apos;s the current inventory of Product X?",
     "When is the next shipment of Product Y expected?",
     "How many units of Product Z were sold last month?",
-    "What's the storage location for Product W?",
+    "What&apos;s the storage location for Product W?",
   ];
 
   return (
@@ -74,7 +74,7 @@ export default function ChatWithContextComponent() {
             Welcome to the Warehouse Manager AI! This chat interface allows you
             to ask questions about inventory, shipments, sales, and product
             locations. Simply type your question in the chat box below and press
-            'Send' or hit Enter.
+            &apos;Send&apos; or hit Enter.
           </p>
           <h3 className="text-xl font-semibold mb-2">Example Questions:</h3>
           <ul className="list-disc pl-5 space-y-2">

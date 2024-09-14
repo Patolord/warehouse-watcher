@@ -6,7 +6,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "convex/react";
 import { Package, PackageOpen } from "lucide-react";
 
-import { types } from "./mov-data-table-toolbar";
 import Actions from "./movements-actions";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
@@ -17,11 +16,6 @@ import {
 } from "@/components/ui/tooltip";
 import { milisecondsToDate } from "@/lib/utils";
 
-/* export const columns: ColumnDef<
-  Doc<"proposals"> & { companyName: string | null }
->[] = [ */
-
-//function that returns warehouse name based on warehouse id
 function WarehouseName({ warehouseId }: { warehouseId: Id<"warehouses"> }) {
   const warehouse = useQuery(api.warehouses.getWarehouseById, {
     warehouseId: warehouseId,
@@ -73,19 +67,29 @@ export const columns: ColumnDef<EnrichedTransaction | null>[] = [
   },
 
   {
-    accessorKey: "Type",
+    accessorKey: "action_type",
     header: "Type",
     cell: ({ row }) => {
       const type = row.original?.action_type;
+      const displayType =
+        type === "added"
+          ? "Added"
+          : type === "removed"
+            ? "Removed"
+            : type === "transfered"
+              ? "Transfered"
+              : type;
 
       return (
         <div className="flex w-[100px] items-center">
-          <span>{type}</span>
+          <span>{displayType}</span>
         </div>
       );
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
+      const type = row.getValue(id);
+      if (typeof type !== "string") return false;
+      return value.includes(type.toLowerCase());
     },
   },
 
@@ -155,8 +159,6 @@ export const columns: ColumnDef<EnrichedTransaction | null>[] = [
       );
     },
   },
-
-  //if from is null, omit row
 
   {
     accessorKey: "Descrição",
