@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "convex/react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api } from "../../../../convex/_generated/api";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 interface StockItem {
   id: string;
@@ -11,11 +12,27 @@ interface StockItem {
   quantity: number;
 }
 
-export function StockLevels({ stockLevels }: { stockLevels: any }) {
+export function StockLevels({
+  stockLevels,
+}: {
+  stockLevels: StockItem[] | undefined;
+}) {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredStockLevels = stockLevels?.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalStock =
+    filteredStockLevels?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+
   return (
     <Card className="col-span-4">
       <CardHeader>
-        <CardTitle>Stock Levels</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          Stock Levels
+          <Badge variant="secondary">Total: {totalStock}</Badge>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {stockLevels === undefined ? (
@@ -25,13 +42,28 @@ export function StockLevels({ stockLevels }: { stockLevels: any }) {
             No stock data available
           </p>
         ) : (
-          <ul>
-            {stockLevels.map((item: StockItem) => (
-              <li key={item.id}>
-                {item.name}: {item.quantity} units
-              </li>
-            ))}
-          </ul>
+          <>
+            <Input
+              type="search"
+              placeholder="Search items..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="mb-4"
+            />
+            <ul className="space-y-2">
+              {filteredStockLevels?.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex items-center justify-between p-2 rounded-md bg-secondary"
+                >
+                  <span>{item.name}</span>
+                  <Badge variant={getStockLevelVariant(item.quantity)}>
+                    {item.quantity} units
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </CardContent>
     </Card>
@@ -47,4 +79,12 @@ function StockLevelsSkeleton() {
       <Skeleton className="h-4 w-3/4" />
     </div>
   );
+}
+
+function getStockLevelVariant(
+  quantity: number
+): "default" | "secondary" | "destructive" {
+  if (quantity > 50) return "default";
+  if (quantity > 20) return "secondary";
+  return "destructive";
 }
