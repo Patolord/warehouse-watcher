@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { api } from "../../../../../../../convex/_generated/api";
 import { Id } from "../../../../../../../convex/_generated/dataModel";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Check, ChevronsUpDown, Plus, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -45,11 +43,6 @@ import { cn } from "@/lib/utils";
 import MaterialList from "./MaterialList";
 import { NewMaterialDialog } from "./NewMaterialDialog";
 
-const materialSchema = z.object({
-  materialId: z.string(),
-  quantity: z.coerce.number().min(1),
-});
-
 export function AddMaterialButton({
   warehouseId,
 }: {
@@ -65,8 +58,7 @@ export function AddMaterialButton({
   const [isNewMaterialDialogOpen, setIsNewMaterialDialogOpen] = useState(false);
 
   const form = useForm({
-    resolver: zodResolver(materialSchema),
-    defaultValues: { materialId: "", quantity: 1 },
+    defaultValues: { materialId: "" },
   });
 
   const removeMaterial = (index: number) => {
@@ -81,8 +73,8 @@ export function AddMaterialButton({
   } = form;
 
   const onAddMaterial = () => {
-    const { materialId, quantity } = getValues();
-    const material = materials!.find((mat) => mat._id === materialId);
+    const { materialId } = getValues();
+    const material = materials?.find((mat) => mat._id === materialId);
     if (material) {
       const isAlreadyAdded = materialsList.some(
         (item) => item.materialId === materialId
@@ -93,13 +85,13 @@ export function AddMaterialButton({
           {
             materialId: material._id,
             materialName: material.name,
-            quantity: Number(quantity),
+            quantity: 1, // Default quantity
           },
         ]);
       } else {
         toast.error("Material already added to the list.");
       }
-      reset({ materialId: "", quantity: 1 });
+      reset({ materialId: "" });
     }
   };
 
@@ -202,15 +194,28 @@ export function AddMaterialButton({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="p-0 w-full">
-                        <Command className="w-full">
+                      <PopoverContent className="p-0 w-[300px] max-h-[300px] overflow-hidden">
+                        <Command className="w-full h-full overflow-hidden">
                           <CommandInput
                             placeholder="Search material..."
                             className="w-full"
                           />
-                          <CommandList className="max-h-[200px]">
+                          <CommandList className="max-h-[228px] overflow-y-auto">
                             <CommandEmpty>No material found.</CommandEmpty>
+
                             <CommandGroup>
+                              <CommandItem
+                                onSelect={() => {
+                                  setIsNewMaterialDialogOpen(true);
+                                  setOpen(false);
+                                }}
+                              >
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create new material
+                              </CommandItem>
+                            </CommandGroup>
+                            <CommandSeparator />
+                            <CommandGroup className="overflow-y-auto">
                               {materials?.map((material) => (
                                 <CommandItem
                                   value={material.name}
@@ -218,6 +223,7 @@ export function AddMaterialButton({
                                   onSelect={() => {
                                     form.setValue("materialId", material._id);
                                     setOpen(false);
+                                    onAddMaterial(); // Add material immediately upon selection
                                   }}
                                 >
                                   <Check
@@ -232,18 +238,6 @@ export function AddMaterialButton({
                                 </CommandItem>
                               ))}
                             </CommandGroup>
-                            <CommandSeparator />
-                            <CommandGroup>
-                              <CommandItem
-                                onSelect={() => {
-                                  setIsNewMaterialDialogOpen(true);
-                                  setOpen(false);
-                                }}
-                              >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Create new material
-                              </CommandItem>
-                            </CommandGroup>
                           </CommandList>
                         </Command>
                       </PopoverContent>
@@ -252,34 +246,6 @@ export function AddMaterialButton({
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="quantity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Quantity</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={1}
-                        {...field}
-                        className="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="button"
-                variant="default"
-                onClick={onAddMaterial}
-                className="w-full"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add to list
-              </Button>
             </div>
 
             <Separator />
@@ -288,6 +254,13 @@ export function AddMaterialButton({
               <MaterialList
                 materialsList={materialsList}
                 onRemove={removeMaterial}
+                onUpdateQuantity={(index, newQuantity) => {
+                  setMaterialsList((prev) =>
+                    prev.map((item, i) =>
+                      i === index ? { ...item, quantity: newQuantity } : item
+                    )
+                  );
+                }}
               />
               <Button
                 type="button"

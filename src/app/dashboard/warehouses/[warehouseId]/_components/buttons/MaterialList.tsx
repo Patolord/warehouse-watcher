@@ -3,6 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { XCircle } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Id } from "../../../../../../../convex/_generated/dataModel";
 
 interface Material {
   materialId: string;
@@ -11,51 +15,41 @@ interface Material {
 }
 
 interface MaterialListProps {
-  materialsList: Material[];
+  materialsList: {
+    materialId: Id<"materials">;
+    materialName: string;
+    quantity: number;
+  }[];
   onRemove: (index: number) => void;
+  onUpdateQuantity: (index: number, newQuantity: number) => void;
 }
 
-const MaterialList: React.FC<MaterialListProps> = ({
+export default function MaterialList({
   materialsList,
   onRemove,
-}) => {
-  const renderContent = () => (
-    <ScrollArea className="h-[200px] pr-4">
-      {materialsList.length === 0 ? (
-        <div className="flex items-center justify-between mb-2 last:mb-0">
-          <div className="flex items-center space-x-2">
-            <Badge variant="secondary" />
-            <span>No item added</span>
-          </div>
-        </div>
-      ) : (
-        materialsList.map((mat, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-between mb-2 last:mb-0"
-          >
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary">{mat.quantity}x</Badge>
-              <span>{mat.materialName}</span>
-            </div>
-            <XCircle
-              className="h-5 w-5 text-muted-foreground cursor-pointer hover:text-destructive transition-colors"
-              onClick={() => onRemove(index)}
-            />
-          </div>
-        ))
-      )}
-    </ScrollArea>
-  );
-
+  onUpdateQuantity,
+}: MaterialListProps) {
   return (
-    <Card className="mt-4">
-      <CardHeader>
-        <CardTitle>Materials List</CardTitle>
-      </CardHeader>
-      <CardContent>{renderContent()}</CardContent>
-    </Card>
+    <div className="space-y-4">
+      {materialsList.map((material, index) => (
+        <div key={material.materialId} className="flex items-center space-x-2">
+          <span className="flex-grow">{material.materialName}</span>
+          <Input
+            type="number"
+            min={1}
+            value={material.quantity}
+            onChange={(e) => onUpdateQuantity(index, Number(e.target.value))}
+            className="w-20"
+          />
+          <Button
+            variant="ghost"
+            className="text-red-600"
+            onClick={() => onRemove(index)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+    </div>
   );
-};
-
-export default MaterialList;
+}
