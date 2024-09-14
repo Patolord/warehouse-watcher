@@ -128,10 +128,12 @@ export const getTransactionsForDisplayByWarehouseId = query({
     const transactions = await ctx.db
       .query("transactions")
       .filter((q) =>
-        q.or(
-          q.eq(q.field("from_location"), args.warehouseId),
-          q.eq(q.field("to_location"), args.warehouseId),
-          q.eq(q.field("userId"), userId)
+        q.and(
+          q.eq(q.field("userId"), userId),
+          q.or(
+            q.eq(q.field("from_location"), args.warehouseId),
+            q.eq(q.field("to_location"), args.warehouseId)
+          )
         )
       )
       .collect();

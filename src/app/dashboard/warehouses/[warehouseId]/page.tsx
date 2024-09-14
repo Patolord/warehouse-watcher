@@ -51,6 +51,14 @@ export default function WarehousePage({
   const currentWarehouse = useQuery(api.warehouses.getWarehouseById, {
     warehouseId: params.warehouseId,
   });
+
+  const uniqueMaterialTypes = useQuery(
+    api.materials.getUniqueMaterialTypesByUser,
+    {}
+  );
+
+  //query inventory information
+
   //query inventory information
   const inventory = useQuery(
     api.inventories.getInventoryForDisplayByWarehouseId,
@@ -75,12 +83,18 @@ export default function WarehousePage({
   }
 
   const isTablet = useMediaQuery("(min-width: 640px)");
-  const [selectedType, setSelectedType] = useState("");
-  const tableData: (EnrichedTransaction | null)[] = transactions || [];
+  const [selectedType, setSelectedType] = useState("all");
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(event.target.value);
   };
+
+  // Filter materials based on selected type
+  const filteredMaterials = inventory
+    ? inventory.filter((material) =>
+        selectedType === "all" ? true : material?.materialType === selectedType
+      )
+    : [];
 
   const mapLink = currentWarehouse
     ? `/dashboard/worldmap?warehouseId=${params.warehouseId}&lat=${currentWarehouse.latitude}&lng=${currentWarehouse.longitude}`
@@ -139,7 +153,10 @@ export default function WarehousePage({
             <h3 className="text-xl mb-3 mt-28">Movements</h3>
 
             <div>
-              <MovDataTable columns={transactionsColumns} data={tableData} />
+              <MovDataTable
+                columns={transactionsColumns}
+                data={transactions ?? []}
+              />
             </div>
           </TabsContent>
         </Tabs>
@@ -172,7 +189,7 @@ export default function WarehousePage({
         alt="Warehouse"
         width={200}
         height={200}
-        className="rounded-lg absolute top-8 right-8 opacity-30 z-0 pointer-events-none"
+        className="hidden sm:block rounded-lg absolute top-8 right-8 opacity-30 z-0 pointer-events-none"
       />
 
       <Tabs defaultValue="inventory">
@@ -192,34 +209,35 @@ export default function WarehousePage({
 
             <div className="mt-10 mb-2">
               <label htmlFor="typeFilter">Filter: </label>
-              {/*  <select
+              <select
                 id="typeFilter"
                 onChange={handleTypeChange}
                 value={selectedType}
               >
-              
+                <option value="all">All Types</option>
                 {uniqueMaterialTypes &&
                   uniqueMaterialTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
+                    <option key={type.value} value={type.value}>
+                      {type.label}
                     </option>
                   ))}
-
-            
-              </select> */}
+              </select>
             </div>
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
               {filteredMaterials.map((material) => (
                 <MaterialCard key={material!.materialId} material={material!} />
               ))}
-            </div> */}
+            </div>
           </div>
         </TabsContent>
         <TabsContent value="movements">
           <h3 className="text-xl mb-3 mt-28">Movements</h3>
 
           <div>
-            <MovDataTable columns={transactionsColumns} data={tableData} />
+            <MovDataTable
+              columns={transactionsColumns}
+              data={transactions ?? []}
+            />
           </div>
         </TabsContent>
       </Tabs>

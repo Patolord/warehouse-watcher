@@ -54,10 +54,13 @@ export function SignInWithPassword({
           error.message.includes("Internal Server Error")
         ) {
           setAuthError("Server error. Please try again later.");
-        } else if (error.message.includes("Invalid email or password")) {
-          setAuthError("Invalid email or password. Please try again.");
+        } else if (
+          error.message.includes("Invalid email or password") ||
+          error.message.includes("ConvexError: Invalid credentials")
+        ) {
+          setAuthError("Incorrect email or password. Please try again.");
         } else {
-          setAuthError("An unknown error occurred");
+          setAuthError("An unknown error occurred. Please try again.");
         }
 
         toast({
@@ -66,13 +69,14 @@ export function SignInWithPassword({
           variant: "destructive",
         });
       } else {
-        setAuthError("An unknown error occurred");
+        setAuthError("An unknown error occurred. Please try again.");
         toast({
           title: "Sign In Error",
           description: "An unknown error occurred",
           variant: "destructive",
         });
       }
+    } finally {
       setSubmitting(false);
     }
   };

@@ -111,7 +111,7 @@ export const columns: ColumnDef<EnrichedTransaction | null>[] = [
   },
   {
     accessorKey: "Materiais",
-    header: "Qtd.",
+    header: "Qty.",
     cell: ({ row }) => {
       const quantities = row.original!.materials.map((material) => ({
         id: material.materialId,
