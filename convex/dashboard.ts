@@ -63,7 +63,7 @@ export const getStockLevels = query({
         const inventories = await ctx.db
             .query("inventories")
             .withIndex("by_userId", (q) => q.eq("userId", userId))
-            .collect();
+            .take(4)
 
         const stockLevelsMap = new Map<string, { id: string, name: string, quantity: number }>();
 

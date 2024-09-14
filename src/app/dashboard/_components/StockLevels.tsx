@@ -23,15 +23,11 @@ export function StockLevels({
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalStock =
-    filteredStockLevels?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-
   return (
     <Card className="col-span-4">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Stock Levels
-          <Badge variant="secondary">Total: {totalStock}</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -81,10 +77,11 @@ function StockLevelsSkeleton() {
   );
 }
 
+// TODO: Implement color based on quantity
 function getStockLevelVariant(
   quantity: number
-): "default" | "secondary" | "destructive" {
-  if (quantity > 50) return "default";
-  if (quantity > 20) return "secondary";
-  return "destructive";
+): "outline" | "outline" | "outline" {
+  if (quantity > 50) return "outline";
+  if (quantity > 20) return "outline";
+  return "outline";
 }
