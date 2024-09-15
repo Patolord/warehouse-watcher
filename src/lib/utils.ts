@@ -11,38 +11,17 @@ export function milisecondsToDate(ms: number) {
 
 export function titleCase(string: string): string {
   const lowercaseWords = [
-    "de",
-    "da",
-    "do",
-    "para",
-    "sem",
-    "com",
-    "em",
-    "por",
-    "na",
-    "no",
-    "nas",
-    "nos",
-    "as",
-    "os",
-    "mm",
-    "cm",
-    "kg",
-    "ml",
-    "km",
-    "mg",
-    "uma",
-    "um",
-    "uns",
+    "a", "an", "the", "and", "but", "or", "for", "nor", "on", "at",
+    "to", "from", "by", "in", "of", "with", "under", "over", "as"
   ];
 
   return string
     .toLowerCase()
     .split(" ")
-    .map((word) =>
-      word.length === 1 || lowercaseWords.includes(word)
-        ? word
-        : word.charAt(0).toUpperCase() + word.slice(1)
+    .map((word, index) =>
+      index === 0 || !lowercaseWords.includes(word)
+        ? word.charAt(0).toUpperCase() + word.slice(1)
+        : word
     )
     .join(" ")
     .trim();
