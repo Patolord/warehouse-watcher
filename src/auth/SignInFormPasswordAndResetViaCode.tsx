@@ -16,6 +16,7 @@ export function SignInFormPasswordAndResetViaCode({
 }: SignInFormPasswordAndResetViaCodeProps) {
   const [step, setStep] = useState<"signIn" | "forgot">("signIn");
   const { toast } = useToast();
+  const provider = "password-with-reset";
 
   const handleSignInSuccess = (email: string) => {
     toast({
@@ -35,7 +36,7 @@ export function SignInFormPasswordAndResetViaCode({
       ) : (
         <ResetPasswordWithEmailCode
           handleCancel={() => setStep("signIn")}
-          provider="email"
+          provider={provider}
         />
       )}
       <Toaster />
