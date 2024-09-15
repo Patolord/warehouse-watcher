@@ -1,3 +1,0 @@
-I'm developing a web application using Next.js 14 with the App Router feature. The backend is powered by Convex DB. For the UI, I'm utilizing Shadcn UI components and styling them with Tailwind CSS. The project is written in TypeScript, and I use Zustand for some state management.
-
-When providing assistance, please consider this tech stack and adhere to best practices associated with these technologies. Focus on integrating features that align with Next.js 14 and App Router conventions, TypeScript types and interfaces, Tailwind CSS styling, Shadcn UI components, Convex DB queries and mutations, and Zustand state management patterns.
