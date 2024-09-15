@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {
   Dialog,
+  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { SignInWithPassword } from "./SignInWithPassword";
 import { Separator } from "@/components/ui/separator";
+import { SignInFormPasswordAndResetViaCode } from "./SignInFormPasswordAndResetViaCode";
 import { SignInWithGitHub } from "./SignInWithGithub";
 
 interface SignInDialogProps {
@@ -17,16 +17,6 @@ interface SignInDialogProps {
 export function SignInDialog({ trigger }: SignInDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handlePasswordReset = () => {
-    // Implement password reset logic here
-    console.log("Password reset requested");
-  };
-
-  const handleSuccess = (email: string) => {
-    console.log(`Signed in/up with email: ${email}`);
-    setIsOpen(false);
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -34,11 +24,8 @@ export function SignInDialog({ trigger }: SignInDialogProps) {
         <DialogHeader>
           <DialogTitle>Sign in to your account</DialogTitle>
         </DialogHeader>
-        <SignInWithPassword
-          onPasswordReset={handlePasswordReset}
-          onSuccess={handleSuccess}
-        />
-        <Separator />
+        <SignInFormPasswordAndResetViaCode onClose={() => setIsOpen(false)} />
+        <Separator className="my-4" />
         <SignInWithGitHub />
       </DialogContent>
     </Dialog>

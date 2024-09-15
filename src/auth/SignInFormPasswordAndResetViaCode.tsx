@@ -1,46 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { ResetPasswordWithEmailCode } from "@/auth/ResetPasswordWithEmailCode";
 import { SignInWithPassword } from "@/auth/SignInWithPassword";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 
+interface SignInFormPasswordAndResetViaCodeProps {
+  onClose: () => void;
+}
+
 /**
- * Users choose between OAuth providers or email and password combo.
- * If they forgot their password, they can reset it via OTP code
- * sent to their email.
+ * Users can sign in with email/password or reset their password via an email code.
  */
-export function SignInFormPasswordAndResetViaCode() {
-    const [step, setStep] = useState<"signIn" | "forgot">("signIn");
-    const { toast } = useToast();
-    const provider = "password-with-reset";
+export function SignInFormPasswordAndResetViaCode({
+  onClose,
+}: SignInFormPasswordAndResetViaCodeProps) {
+  const [step, setStep] = useState<"signIn" | "forgot">("signIn");
+  const { toast } = useToast();
 
-    const handleSignInSuccess = (email: string) => {
-        toast({
-            title: "Sign in successful",
-            description: `Signed in as ${email}`,
-        });
-        // Additional logic after successful sign in
-    };
+  const handleSignInSuccess = (email: string) => {
+    toast({
+      title: "Sign in successful",
+      description: `Signed in as ${email}`,
+    });
+    onClose();
+  };
 
-    return (
-        <div className="max-w-[384px] mx-auto flex flex-col gap-4">
-            {step === "signIn" ? (
-                <>
-                    <h2 className="font-semibold text-2xl tracking-tight">
-                        Sign in or create an account
-                    </h2>
-                    <SignInWithPassword
-                        onPasswordReset={() => setStep("forgot")}
-                        onSuccess={handleSignInSuccess}
-                    />
-                </>
-            ) : (
-                <ResetPasswordWithEmailCode
-                    handleCancel={() => setStep("signIn")}
-                    provider={provider}
-                />
-            )}
-            <Toaster />
-        </div>
-    );
+  return (
+    <div>
+      {step === "signIn" ? (
+        <SignInWithPassword
+          onPasswordReset={() => setStep("forgot")}
+          onSuccess={handleSignInSuccess}
+        />
+      ) : (
+        <ResetPasswordWithEmailCode
+          handleCancel={() => setStep("signIn")}
+          provider="email"
+        />
+      )}
+      <Toaster />
+    </div>
+  );
 }
